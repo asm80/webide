@@ -26,7 +26,8 @@ window.seth=seth
 
 const resizer = (event) => {
 	console.log("Onresize")
-	seth(window.innerHeight - 100)}
+	seth(window.innerHeight - 150)
+}
 
 
 addEventListener("resize", resizer)
