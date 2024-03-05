@@ -4,7 +4,7 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+		<link rel="stylesheet" href="styles.scss">
 		<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 		<link rel="stylesheet" href="./assets/fontawesome/css/all.min.css">
 
@@ -49,7 +49,10 @@
 			}
 		</style>
 	</head>
-	<body class=" small is-fullheight" >
+	<body class=" small is-fullheight dark" >
+
+		<div class='container hero is-fullheight'>
+
 			<nav class="navbar" role="navigation" aria-label="main navigation">
 				<div class="navbar-brand">
 				  <a class="navbar-item" href="https://bulma.io">
@@ -110,7 +113,9 @@
 				  </div>
 				</div>
 			  </nav>
-		<div class="container ">
+
+
+		<div class="ncontainer">
 
 		<div class="columns ">
 			<div class="column is-2">
@@ -123,7 +128,7 @@
 			</div>
 			<div class="column is-8 ">
 				
-				<div class="tabs">
+				<div class="tabs p-0 m-0">
 					<ul>
 					  <li class="is-active"><a>Pictures</a></li>
 					  <li><a>Music</a></li>
@@ -142,9 +147,10 @@
 
 		</div>
 
-		<footer class="footer p-0">
+		<footer class="footer p-0 is-fixed-bottom mt-auto">
 			  <span class="">Footer</span>
 		</footer>
+		</div>
 		<script type="module" src="index.js"></script>
 		<script type="module" src="bstree/bstreeview.js"></script>
 		<script type="module" src="main.js"></script>
