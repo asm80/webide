@@ -1,0 +1,30 @@
+* {
+    font-family: 'JetBrains Mono', monospace;
+}
+body {
+    height:100vh;
+    overflow-y:hidden;
+}
+
+body.small {
+    font-size: 0.8rem;
+}
+body.big {
+    font-size: 1.2rem;
+}
+.mybg {
+    background:rgb(30, 30, 30);
+    color:#d4d4d4
+}
+
+@media (min-width: 1920px) {
+    .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
+        max-width: 1890;
+    }
+}
+
+@media screen and (min-width: 1920px) {
+.container:not(.is-max-desktop):not(.is-max-widescreen) {
+max-width: 1890px;
+}
+}
