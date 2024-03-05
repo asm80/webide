@@ -109,3 +109,4 @@ addEventListener("resize", resizer)
 	</div>
 
 </div>
+<Footer />
