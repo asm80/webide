@@ -8,7 +8,7 @@
         collapseIcon: 'fa fa-angle-right fa-fw',
         expandClass: 'show',
         indent: 1.25,
-        parentsMarginLeft: '1.25rem',
+        parentsMarginLeft: '.55rem',
     }
 
     const showLevel = (level) => {
@@ -33,11 +33,12 @@
     .sb-tree-wrapper div {
         /*padding: 5px;*/
     }
-    .sb-tree-wrapper div:hover {
+    .sb-tree-wrapper div.item:hover {
         background-color: #333;
     }
-    .sb-tree-wrapper i {
-        margin-right: 5px;
+    .sb-tree-wrapper div.item {
+        cursor: pointer;
+       /*margin-right: 5px;*/
     }
 </style>
 
@@ -46,15 +47,16 @@
 
 
 {#each data as item, index}
-    <div>
+    <div class="item {item.nodes?"folder":"file"}" role="button" tabindex="0" on:click={updown(item)} on:keydown={updown(item)}>
         {#if item.nodes}
-            <i class={item.expanded?options.expandIcon:options.collapseIcon} on:click={updown(item)}></i>
+            <i class={item.expanded?options.expandIcon:options.collapseIcon}></i>
         {/if}
-        <i class={item.icon}></i>&nbsp;{item.text}
-        [{index}]
+        {item.text}
+                <!--<i class={item.icon}></i>&nbsp;-->
+
     </div>
-    {#if item.nodes}
-        <div style="margin-left:{options.parentsMarginLeft}">
+    {#if item.nodes && item.expanded}
+        <div style="margin-left:{options.parentsMarginLeft}; border-left:1px dotted #444; padding-left:{options.parentsMarginLeft}">
             <svelte:self data={item.nodes} level={level+1}/>
         </div>
     {/if}

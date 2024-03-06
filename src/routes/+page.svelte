@@ -13,12 +13,22 @@
 
 </script>
 
+<style>
+	.scrollbar::-webkit-scrollbar {
+  width: 15px;
+}
+::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius:0;
+}
+</style>
+
 <div class="{ideSize}">
 <Nav />
 
 <div class="columns is-fullheight">
-	<div class="column is-2 is-sidebar-menu">
-		<aside class="menu">
+	<div class="column is-2 is-sidebar-menu scrollbar">
+		<aside class="amenu">
 		file tree
 		<SBTree data={treeData} />
 		</aside>
