@@ -1,5 +1,6 @@
 <script>
 
+    import { slide } from "svelte/transition";
     export let data;
     export let level=0;
 
@@ -56,7 +57,7 @@
 
     </div>
     {#if item.nodes && item.expanded}
-        <div style="margin-left:{options.parentsMarginLeft}; border-left:1px dotted #444; padding-left:{options.parentsMarginLeft}">
+        <div style="margin-left:{options.parentsMarginLeft}; border-left:1px dotted #444; padding-left:{options.parentsMarginLeft}" transition:slide>
             <svelte:self data={item.nodes} level={level+1}/>
         </div>
     {/if}
