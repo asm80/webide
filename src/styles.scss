@@ -2,13 +2,13 @@
 
 // Import Bulma Sass file
 
-
+$dark: rgb(30, 30, 30);
  
 @import "./assets/bulma/bulma.sass";
 
 @import "./assets/own.css";
 
-$dark: rgb(30, 30, 30);
+
 
 body {
     background-color: $light;

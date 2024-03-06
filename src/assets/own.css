@@ -6,10 +6,10 @@ body {
     overflow-y:hidden;
 }
 
-body.small {
+.small {
     font-size: 0.8rem;
 }
-body.big {
+.big {
     font-size: 1.2rem;
 }
 .mybg {
