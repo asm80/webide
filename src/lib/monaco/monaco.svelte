@@ -37,7 +37,10 @@ seth(window.innerHeight - 150)
 const setFontSize = (size) => {
     let fontSize = (size=="small"?12:size=="big"?24:16)
     console.log("Updating font size", size)
-    if (editor) editor.updateOptions({fontSize: fontSize})
+    if (editor) {
+        editor.updateOptions({fontSize: fontSize})
+        editor.updateOptions({lineHeight: fontSize+2})
+    }
 }
 
 $: setFontSize(ideSize)
@@ -74,6 +77,7 @@ function loadCode(code, language) {
 			theme: 'vs-dark',
             fontLigatures: true,
             fontSize: (ideSize=="small"?12:ideSize=="big"?24:16),
+            wordWrap: true
 		});
 
 		loadCode(jsCode, 'javascript');

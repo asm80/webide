@@ -1,6 +1,4 @@
-$(function () {
-
-    var json = [
+export const treeData = [
         {
             text: "Source",
             icon: "fa-regular fa-folder",
@@ -81,12 +79,4 @@ $(function () {
         }
     ];
 
-    $('#tree').bstreeview({
-        data: json,
-        expandIcon: 'fa fa-angle-down fa-fw',
-        collapseIcon: 'fa fa-angle-right fa-fw',
-        indent: 1.25,
-        parentsMarginLeft: '1.25rem',
-        openNodeLinkOnNewTab: true
-    });
-});
+    
