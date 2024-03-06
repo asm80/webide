@@ -30,8 +30,10 @@ editor.layout(lay)
 //seth=seth
 
 const resizer = () => {
+	
 console.log("Onresize")
-seth(window.innerHeight - 150)
+seth(window.innerHeight - 120)
+
 }
 
 const setFontSize = (size) => {
@@ -73,7 +75,7 @@ function loadCode(code, language) {
 		monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
 
 		editor = monaco.editor.create(editorElement, {
-			automaticLayout: true,
+			//automaticLayout: true,
 			theme: 'vs-dark',
             fontLigatures: true,
             fontSize: (ideSize=="small"?12:ideSize=="big"?24:16),

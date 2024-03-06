@@ -1,7 +1,7 @@
 <nav class="navbar has-background-dark has-text-light" aria-label="main navigation">
     <div class="navbar-brand">
       <a class="navbar-item" href="https://bulma.io">
-        <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28" alt="">
+        <img src="https://bulma.io/images/bulma-logo.png" width="50" height="18" alt="">
       </a>
   
       <a role="button" href="/" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
@@ -46,6 +46,7 @@
   
       <div class="navbar-end">
         <div class="navbar-item">
+          <!--
           <div class="buttons">
             <a class="button is-primary" href="/">
               <strong>Sign up</strong>
@@ -54,6 +55,7 @@
               Log in
             </a>
           </div>
+          -->
         </div>
       </div>
     </div>

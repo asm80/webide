@@ -3,6 +3,13 @@
 // Import Bulma Sass file
 
 $dark: rgb(30, 30, 30);
+
+
+$navbar-height: 2.5rem;
+
+$footer-height: 0.75rem;
+
+
  
 @import "./assets/bulma/bulma.sass";
 
@@ -54,3 +61,33 @@ body.dark button {
     background: $light;
     color: $dark;
 }
+
+
+
+.is-sidebar-menu {
+    padding: 0;
+    background: $grey-dark;
+    li {
+      a {
+        color: $white;
+      }
+    }
+  }
+  .columns {
+    &.is-fullheight {
+      min-height: calc(100vh - ( #{$navbar-height} + .75rem ) - ( #{$footer-height} + .75rem ) );
+      max-height: calc(100vh - ( #{$navbar-height} + .75rem ) - ( #{$footer-height} + .75rem ) );
+      height:     calc(100vh - ( #{$navbar-height} + .75rem ) - ( #{$footer-height} + .75rem ) );
+      display: flex;
+      flex-direction: row;
+      justify-content: stretch;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+      .column {
+        overflow-y: auto;
+      }
+    }
+  }
+  .is-main-content {
+    //background: $grey-lighter;
+  }

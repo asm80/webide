@@ -17,11 +17,13 @@
 <Nav />
 
 <div class="columns is-fullheight">
-	<div class="column is-2">
+	<div class="column is-2 is-sidebar-menu">
+		<aside class="menu">
 		file tree
 		<SBTree data={treeData} />
+		</aside>
 	</div>
-	<div class="column is-8 ais-fullheight">
+	<div class="column is-8 ais-fullheight is-main-content">
 		<Monaco ideSize={ideSize} />
 	</div>
 	<div class="column is-1 ">
