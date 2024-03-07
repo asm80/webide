@@ -2,13 +2,22 @@
 
 // Import Bulma Sass file
 
-$dark: rgb(30, 30, 30);
+$dark: rgb(20, 20, 20);
+$less-dark: rgb(40, 40, 40);
+$darker: rgb(20, 20, 20);
 
 
 $navbar-height: 2.5rem;
 
 $footer-height: 0.75rem;
 
+$tabs-link-padding: 0.2rem 0.4rem;
+$tabs-boxed-link-radius: 0;
+$tabs-boxed-link-active-background-color: $dark;
+$tabs-border-bottom-color: $less-dark;
+$tabs-toggle-link-border-color: $less-dark;
+$tabs-boxed-link-active-border-color: $less-dark;
+$tabs-boxed-link-active-border-bottom-color: white;
 
  
 @import "./assets/bulma/bulma.sass";

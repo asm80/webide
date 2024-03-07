@@ -32,7 +32,7 @@ editor.layout(lay)
 const resizer = () => {
 	
 console.log("Onresize")
-seth(window.innerHeight - 120)
+seth(window.innerHeight - 110)
 
 }
 
