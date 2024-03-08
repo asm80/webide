@@ -18,6 +18,7 @@ let editor;
 let model;
 
 export let ideSize
+export let editorText;
 
 
 const seth = (height) => {
@@ -94,6 +95,13 @@ function loadCode(code, language) {
 
 //*****----*/
 
+const changeEditorText = (editorText) => {
+    console.log("Changing editor text", editorText)
+    //editorText = editorText
+    if (editor) editor.getModel().setValue(editorText);
+}
+
+$: changeEditorText(editorText)
 
 </script>
 

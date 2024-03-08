@@ -2,7 +2,9 @@
 
 	let ideSize="big"
 
-	import Monaco from '$lib/monaco/monaco.svelte';
+	
+
+	import Editor from '$lib/editor/editor.svelte';
 
 	import Nav from '$lib/nav.svelte';
 	import SBTree from '$lib/sbtree/sbtree.svelte';
@@ -66,21 +68,7 @@
 		</aside>
 	</div>
 	<div class="column is-8 ais-fullheight is-main-content p-0">
-		<div class="tabs is-boxed is-small pb-0" id="fileTabs">
-			<ul>
-			  <li class="is-active"><a>Pictures</a></li>
-			  <li><a>Music</a></li>
-			  <li><a>Videos</a></li>
-			  <li><a>Documents</a></li><li><a>Documents</a></li><li><a>Documents</a></li><li><a>Documents</a></li><li><a>Documents</a></li><li><a>Documents</a></li>
-			  <li><a>Documents</a></li><li><a>Documents</a></li><li><a>Documents</a></li><li><a>Documents</a></li><li><a>Documents</a></li>
-			  <li><a>Documents</a></li><li><a>Documents</a></li><li><a>Documents</a></li><li><a>Documents</a></li>
-			  <li><a>Documents</a></li><li><a>Documents</a></li><li><a>Documents</a></li>
-			  <li><a>Documents</a></li><li><a>Documents</a></li>
-			  <li><a>Documents</a></li>
-			  <li><a>Nic</a></li>
-			</ul>
-		  </div>
-		<Monaco ideSize={ideSize} />
+		<Editor ideSize />
 	</div>
 	<div class="column is-1 ">
 		<h1 class="text-center">Hello <i class="fa-solid fa-folder"></i> World</h1>
