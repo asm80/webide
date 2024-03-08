@@ -13,11 +13,14 @@ import { code as phpCode } from '$lib/php_code';
 import { code as pyCode } from '$lib/py_code';
 import { code as htmlCode } from '$lib/html_code';
 
+import { a80Monarch } from '../../util/lang/a80.js';
+
 import { createEventDispatcher } from "svelte";
 
 let editorElement;
 let editor;
 let model;
+let doNotCheckOnChange = false;
 
 export let ideSize;
 export let editorText;
@@ -42,8 +45,8 @@ seth(window.innerHeight - 110)
 
 const dispatch = createEventDispatcher();
 
-const saveFile = (tab) => {
-	dispatch("saveFile", tab);
+const saveFile = (content) => {
+	dispatch("saveFile", content);
 }
 
 function loadCode(code, language) {
@@ -53,23 +56,15 @@ function loadCode(code, language) {
 	}
 
 	onMount(async () => {
+		monaco.languages.register({ id: 'a80' });
+		monaco.languages.setMonarchTokensProvider('a80', a80Monarch);
+		
 		self.MonacoEnvironment = {
 			getWorker: function (_, label) {
-				if (label === 'json') {
-					return new jsonWorker();
-				}
-				if (label === 'css' || label === 'scss' || label === 'less') {
-					return new cssWorker();
-				}
-				if (label === 'html' || label === 'handlebars' || label === 'razor') {
-					return new htmlWorker();
-				}
-				if (label === 'typescript' || label === 'javascript') {
-					return new tsWorker();
-				}
 				return new editorWorker();
 			}
 		};
+		
 
 		//monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
 
@@ -79,7 +74,8 @@ function loadCode(code, language) {
             fontLigatures: true,
             fontSize: (ideSize=="small"?12:ideSize=="big"?24:16),
 			lineHeight: (ideSize=="small"?16:ideSize=="big"?32:24),
-            wordWrap: true
+            wordWrap: true,
+			language: 'a80',
 		});
 
 		//loadCode(jsCode, 'javascript');
@@ -87,6 +83,13 @@ function loadCode(code, language) {
 		//Capture Ctrl+S to dispatch save event
 		editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
 			 saveFile(editor.getModel().getValue());
+		});
+
+		// on change
+		editor.getModel().onDidChangeContent((event) => {
+			if (doNotCheckOnChange) return
+		  console.log("Content changed", event)
+		  dispatch("fileEdited", editor.getModel().getValue());
 		});
 		//editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Space, () => console.log("hello world"))
 		resizer()
@@ -103,7 +106,9 @@ function loadCode(code, language) {
 const changeEditorText = (editorText) => {
     //console.log("Changing editor text", editorText)
     //editorText = editorText
+	doNotCheckOnChange = true
     editor?.getModel().setValue(editorText);
+	doNotCheckOnChange = false
 }
 
 $: changeEditorText(editorText)

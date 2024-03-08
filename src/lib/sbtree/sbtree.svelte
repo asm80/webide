@@ -3,6 +3,7 @@
     import { slide } from "svelte/transition";
     export let data;
     export let level=0;
+    export let path="/"
 
     import ContextMenu from "./contextMenu.svelte";
 
@@ -59,6 +60,12 @@
         text-transform: uppercase;
         /*background-color: #444;*/
     }
+    .sb-tree-wrapper .hovermenu {
+        visibility: hidden;
+    }
+    .sb-tree-wrapper:hover .hovermenu {
+        visibility: visible;
+    }
 </style>
 
 
@@ -70,17 +77,26 @@
         on:click={updown(item)} 
         on:keydown={updown(item)}
         on:contextmenu|preventDefault={showContextMenu}
+
+        title="{item.title?item.title:(path+item.text)}"
         >
         {#if item.nodes}
             <i class={item.expanded?options.expandIcon:options.collapseIcon}></i>
         {/if}
         {item.text}
+        {#if item.hoverMenu}
+        <div class="is-pulled-right has-text-right hovermenu">
+            <i class="fa-solid fa-file-circle-plus" title="New File"></i>&nbsp;
+            <i class="fa-solid fa-folder-plus"  title="New Folder"></i>&nbsp;
+            <i class="fa-solid fa-minimize" title="Collapse all"></i>
+        </div>
+        {/if}
                 <!--<i class={item.icon}></i>&nbsp;-->
 
     </div>
     {#if item.nodes && item.expanded}
         <div style="margin-left:{options.parentsMarginLeft}; border-left:1px dotted #444; padding-left:{options.parentsMarginLeft}" transition:slide>
-            <svelte:self data={item.nodes} level={level+1}/>
+            <svelte:self data={item.nodes} level={level+1} path={path+item.text+"/"}/>
         </div>
     {/if}
 {/each}

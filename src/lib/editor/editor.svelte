@@ -6,9 +6,9 @@
     let editorText = "Dummy"
 
     let tabsOpened = [
-        {fn: "index.html", data: "<h1>Hello World</h1>"},
+        {fn: "index.html", data: "<h1>Hello World</h1>", dirty:true},
         {fn: "index.js", data: "console.log('Hello World')", active:true},
-        {fn: "index.css", data: "h1 {color: red}"}
+        {fn: "index.css", dangling: true, data: "h1 {color: red}"}
     ]
 
     let activeTab
@@ -30,9 +30,25 @@
     editorText = tab.data;
 }
 
+const closeTab = (event) => {
+    let tab = event.detail
+    tabsOpened = tabsOpened.filter(t => t.fn != tab.fn); 
+    console.log("Close tab", tab, tabsOpened)
+    tabsOpened = tabsOpened; //do reactivity things
+}
+
 const saveFile = (event) => {
     let data = event.detail
+
     console.log("Saved file", data, activeTab)
+    activeTab.dirty = false
+    tabsOpened = tabsOpened
+}
+const fileEdited = (event) => {
+    let data = event.detail
+    activeTab.data = data
+    activeTab.dirty = true
+    tabsOpened = tabsOpened
 }
 
 //file contents is taken from the selected tab
@@ -43,5 +59,5 @@ $: console.log("IDE SIZE", ideSize)
 
 </script>
 
-<EditorTabs tabsOpened={tabsOpened} on:selectTab={selectTab}/>
-<Monaco {ideSize} editorText={editorText} on:saveFile={saveFile} />
+<EditorTabs tabsOpened={tabsOpened} on:selectTab={selectTab} on:closeTab={closeTab}/>
+<Monaco {ideSize} editorText={editorText} on:saveFile={saveFile} on:fileEdited={fileEdited} />

@@ -1,5 +1,6 @@
 export const treeData = [
         {text:"My Project",
+        hoverMenu: true,
                     nodes: [
                         {
                             text: "src",
@@ -35,6 +36,7 @@ export const treeData = [
         {
             text: "Workspace",
             icon: "fa-regular fa-folder",
+            title: "Open workspaces"
         },
         {
             icon: "fa fa-archive fa-fw",

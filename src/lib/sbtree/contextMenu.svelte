@@ -86,16 +86,10 @@
             'class': 'fa-solid fa-print'
         },
         {
-            'name': 'hr',
-        },
-        {
             'name': 'settings',
             'onClick': dummyHandler,
             'displayText': "Settings",
             'class': 'fa-solid fa-gear'
-        },
-        {
-            'name': 'hr',
         },
         {
             'name': 'trash',
@@ -116,11 +110,8 @@
 <div use:getContextMenuDimension class="menu has-background-dark has-text-light" style="position: absolute; top:{pos.y}px; left:{pos.x}px; border:1px solid white">
         <ul class="menu-list">
             {#each menuItems as item}
-                {#if item.name == "hr"}
-                    
-                {:else}
+
                     <li><a on:click={item.onClick}><i class={item.class}></i>{item.displayText}</a></li>
-                {/if}
             {/each}
         </ul>
 </div>

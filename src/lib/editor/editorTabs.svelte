@@ -21,12 +21,57 @@ const dispatch = createEventDispatcher();
 const selectTab = (tab) => {
     dispatch("selectTab", tab);
 }
+const closeTab = (tab) => {
+    dispatch("closeTab", tab);
+    /*
+    tabsOpened = tabsOpened.filter(t => t.fn != tab.fn); 
+    //console.log("Close tab", tab, tabsOpened)
+    tabsOpened = tabsOpened; //do reactivity things
+    */
+}
 </script>
+
+<style>
+    .dangling a {
+        font-style: italic;
+        color: #ddd
+    }
+    .tabs li a i {
+        width:10px
+    }
+    
+    .tabs li a i.fa-xmark {
+        color: #222
+    }
+    .tabs li:hover a:hover i {
+         color:#ddd
+    }
+
+    .tabs li:hover a:hover i.fa-circle {
+         display:none;
+    }
+    .tabs li:hover a:hover i.fa-xmark {
+         display:inline;
+    }
+
+    .tabs li a i.fa-circle {        
+        display:none
+    }
+
+    .tabs li.dirty a i.fa-xmark {
+        display:none
+    }    
+    .tabs li.dirty a i.fa-circle {
+        display:inline
+    }    
+</style>
 
 <div class="tabs is-boxed is-small pb-0 mb-0" id="fileTabs">
     <ul>
         {#each tabsOpened as tab}
-            <li class="{tab.active?'is-active':''}"><a on:click={() => selectTab(tab)}>{lastElementOfFileName(tab.fn)}</a></li>
+            <li class="{tab.active?'is-active':''} {tab.dangling?"dangling":""} {tab.dirty?"dirty":""}">
+                <a on:click={() => selectTab(tab)}>{lastElementOfFileName(tab.fn)}&nbsp;<i on:click={()=>closeTab(tab)} class="fa-solid fa-xmark"></i><i class="fa-solid fa-circle"></i></a>
+            </li>
         {/each}
     </ul>
   </div>
