@@ -1,7 +1,7 @@
 <nav class="navbar has-background-dark has-text-light" aria-label="main navigation">
     <div class="navbar-brand">
       <a class="navbar-item" href="https://bulma.io">
-        <img src="https://bulma.io/images/bulma-logo.png" width="50" height="18" alt="">
+        <img src="/asm80-2-logo.svg" width="50" height="18" alt="">
       </a>
   
       <a role="button" href="/" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
@@ -18,12 +18,12 @@
         </a>
   
         <a class="navbar-item" href="/">
-          Documentation
+          Docs
         </a>
   
         <div class="navbar-item has-dropdown is-hoverable">
           <a class="navbar-link" href="/">
-            More
+            Tools
           </a>
   
           <div class="navbar-dropdown">

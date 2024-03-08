@@ -13,11 +13,13 @@ import { code as phpCode } from '$lib/php_code';
 import { code as pyCode } from '$lib/py_code';
 import { code as htmlCode } from '$lib/html_code';
 
+import { createEventDispatcher } from "svelte";
+
 let editorElement;
 let editor;
 let model;
 
-export let ideSize
+export let ideSize;
 export let editorText;
 
 
@@ -37,16 +39,12 @@ seth(window.innerHeight - 110)
 
 }
 
-const setFontSize = (size) => {
-    let fontSize = (size=="small"?12:size=="big"?24:16)
-    console.log("Updating font size", size)
-    if (editor) {
-        editor.updateOptions({fontSize: fontSize})
-        editor.updateOptions({lineHeight: fontSize+2})
-    }
-}
 
-$: setFontSize(ideSize)
+const dispatch = createEventDispatcher();
+
+const saveFile = (tab) => {
+	dispatch("saveFile", tab);
+}
 
 function loadCode(code, language) {
 		model = monaco.editor.createModel(code, language);
@@ -73,17 +71,24 @@ function loadCode(code, language) {
 			}
 		};
 
-		monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
+		//monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
 
 		editor = monaco.editor.create(editorElement, {
 			//automaticLayout: true,
 			theme: 'vs-dark',
             fontLigatures: true,
             fontSize: (ideSize=="small"?12:ideSize=="big"?24:16),
+			lineHeight: (ideSize=="small"?16:ideSize=="big"?32:24),
             wordWrap: true
 		});
 
-		loadCode(jsCode, 'javascript');
+		//loadCode(jsCode, 'javascript');
+
+		//Capture Ctrl+S to dispatch save event
+		editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+			 saveFile(editor.getModel().getValue());
+		});
+		//editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Space, () => console.log("hello world"))
 		resizer()
 	});
 
@@ -96,12 +101,24 @@ function loadCode(code, language) {
 //*****----*/
 
 const changeEditorText = (editorText) => {
-    console.log("Changing editor text", editorText)
+    //console.log("Changing editor text", editorText)
     //editorText = editorText
-    if (editor) editor.getModel().setValue(editorText);
+    editor?.getModel().setValue(editorText);
 }
 
 $: changeEditorText(editorText)
+
+const setFontSize = (size) => {
+	let fontSize = (size=="small"?12:size=="big"?24:16)
+	//console.log("Updating font size", fontSize, size)
+	if (editor) {
+		editor.updateOptions({fontSize: fontSize})
+		editor.updateOptions({lineHeight: fontSize+4})
+	}
+}
+
+$: setFontSize(ideSize)
+
 
 </script>
 

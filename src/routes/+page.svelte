@@ -1,6 +1,6 @@
 <script>
 
-	let ideSize="big"
+	let ideSize="small"
 
 	
 
@@ -63,12 +63,11 @@
 <div class="columns is-fullheight">
 	<div class="column is-2 is-sidebar-menu scrollbar">
 		<aside class="amenu">
-		file tree
-		<SBTree data={treeData} />
+			<SBTree data={treeData} />
 		</aside>
 	</div>
 	<div class="column is-8 ais-fullheight is-main-content p-0">
-		<Editor ideSize />
+		<Editor {ideSize} />
 	</div>
 	<div class="column is-1 ">
 		<h1 class="text-center">Hello <i class="fa-solid fa-folder"></i> World</h1>

@@ -4,6 +4,10 @@
     export let data;
     export let level=0;
 
+    import ContextMenu from "./contextMenu.svelte";
+
+    let showMenu = false;
+
     let options = {
         expandIcon: 'fa fa-angle-down fa-fw',
         collapseIcon: 'fa fa-angle-right fa-fw',
@@ -12,12 +16,21 @@
         parentsMarginLeft: '.55rem',
     }
 
-    const showLevel = (level) => {
-        for (let item of data) {
-            if (item.level === level) {
-                console.log(item)
-            }
+    let posx, posy
+    const showContextMenu = (e) => {
+        if (showMenu) {
+            showMenu = false
+            return
         }
+        posx = e.clientX
+        posy = e.clientY
+                
+        console.log("Context menu level", level)
+        showMenu = true
+    }
+
+    const onPageClick = (e) => {
+        showMenu = false
     }
 
     const updown = (item) => {
@@ -41,6 +54,11 @@
         cursor: pointer;
        /*margin-right: 5px;*/
     }
+    .sb-tree-level0 {
+        /*font-weight: bold;*/
+        text-transform: uppercase;
+        /*background-color: #444;*/
+    }
 </style>
 
 
@@ -48,7 +66,11 @@
 
 
 {#each data as item, index}
-    <div class="item {item.nodes?"folder":"file"}" role="button" tabindex="0" on:click={updown(item)} on:keydown={updown(item)}>
+    <div class="item {item.nodes?"folder":"file"} {level==0?"sb-tree-level0":""}" role="button" tabindex="0" 
+        on:click={updown(item)} 
+        on:keydown={updown(item)}
+        on:contextmenu|preventDefault={showContextMenu}
+        >
         {#if item.nodes}
             <i class={item.expanded?options.expandIcon:options.collapseIcon}></i>
         {/if}
@@ -64,3 +86,9 @@
 {/each}
 
     </div>
+
+    {#if level==0}
+        <ContextMenu {showMenu} {posx} {posy} />
+    {/if}
+            <svelte:window on:click={onPageClick} />
+    
