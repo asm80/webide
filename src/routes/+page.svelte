@@ -2,7 +2,8 @@
 
 	let ideSize="small"
 
-	
+	import { SignIn, SignOut } from "@auth/sveltekit/components"
+	import { page } from "$app/stores"
 
 	import Editor from '$lib/editor/editor.svelte';
 
@@ -70,12 +71,37 @@
 		<Editor {ideSize} />
 	</div>
 	<div class="column is-1 ">
-		<h1 class="text-center">Hello <i class="fa-solid fa-folder"></i> World</h1>
+
+{#if $page.data.session}
+	{#if $page.data.session.user?.image}
+	  <img
+		src={$page.data.session.user.image}
+		class="avatar"
+		alt="User Avatar"
+	  />
+	{/if}
+	{JSON.stringify($page.data.session)}
+	<span class="signedInText">
+	  <small>Signed in as</small><br />
+	  <strong>{$page.data.session.user?.name ?? "User"}</strong>
+	</span>
+	<SignOut>
+	  <div slot="submitButton" class="buttonPrimary">Sign out</div>
+	</SignOut>
+  {:else}
+	<span class="notSignedInText">You are not signed in</span>
+	<SignIn>
+	  <div slot="submitButton" class="buttonPrimary">Sign in</div>
+	</SignIn>
+  {/if}
+
 		<select class="select" bind:value={ideSize}>
 			<option>small</option>
 			<option>medium</option>
 			<option>big</option>
 		</select>
+
+
 	</div>
 
 </div>
