@@ -101,13 +101,22 @@
 </script>
 
 <style>
-    .menu {
+    .contextmenu {
         font-size: inherit;
+        padding:3px;
+        background: #444;
+    }
+    .contextmenu ul li a {
+        background-color: #444;
+    }
+    .contextmenu ul li a:hover {
+        background-color: #000;
+        color:#fff
     }
 </style>
 
 {#if showMenu}
-<div use:getContextMenuDimension class="menu has-background-dark has-text-light" style="position: absolute; top:{pos.y}px; left:{pos.x}px; border:1px solid white">
+<div use:getContextMenuDimension class="menu contextmenu has-background-dark has-text-light" style="position: absolute; top:{pos.y}px; left:{pos.x}px; border:1px solid white">
         <ul class="menu-list">
             {#each menuItems as item}
 

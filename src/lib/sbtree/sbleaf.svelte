@@ -1,13 +1,11 @@
 <script>
 
     import { createEventDispatcher } from "svelte";
-    import SBLeaf from "./sbleaf.svelte";
     import { slide } from "svelte/transition";
     export let data;
     export let level=0;
     export let path="/"
 
-    import ContextMenu from "./contextMenu.svelte";
 
     let showMenu = false;
 
@@ -21,27 +19,7 @@
         parentsMarginLeft: '.55rem',
     }
 
-    let posx, posy
 
-
-    const showContextMenu = (msg) => {
-        console.log("SCM", msg)
-        if (showMenu) {
-            showMenu = false
-            setTimeout(() => {
-                posx = msg.detail.posx
-                posy = msg.detail.posy
-                showMenu = true
-            }, 100)
-            return
-        }
-        posx = msg.detail.posx
-        posy = msg.detail.posy
-                
-        //console.log("Context menu level", level)
-        showMenu = true
-        posx = posx
-    }
 
 
 
@@ -49,14 +27,18 @@
         showMenu = false
     }
 
-    //const dispatch = createEventDispatcher();
+    const dispatch = createEventDispatcher();
 
     const ctxm = (e) => {
         let posx = e.clientX
         let posy = e.clientY
-        //console.log("ctxm, not dispatch, do it instead", level, e);
-        showContextMenu({detail: {level, posx, posy}}) //faked message
-        //dispatch("ctxm", {level, posx, posy});
+        console.log("ctxm dispatch", level, e);
+        dispatch("ctxm", {level, posx, posy});
+    }
+
+    const raiseCtxm = (e) => {
+        console.log("Raise ctxm", e)
+        dispatch("ctxm", e.detail);
     }
 
     const updown = (item) => {
@@ -66,17 +48,12 @@
         data=data
     }
 </script>
-
 <style>
-    .sb-tree-wrapper {
-    }
-    .sb-tree-wrapper div {
-        /*padding: 5px;*/
-    }
+
     .sb-tree-wrapper div.item:hover {
         background-color: #333;
     }
-    .sb-tree-wrapper div.item {
+    div.item {
         cursor: pointer;
        /*margin-right: 5px;*/
     }
@@ -85,16 +62,15 @@
         text-transform: uppercase;
         /*background-color: #444;*/
     }
-    .sb-tree-wrapper .hovermenu {
+    .hovermenu {
         visibility: hidden;
     }
-    .sb-tree-wrapper:hover .hovermenu {
+    hover .hovermenu {
         visibility: visible;
     }
 </style>
 
-
-    <div class="sb-tree-wrapper">
+    <div class="{level==0?"sb-tree-wrapper":""}">
 
 
 {#each data as item, index}
@@ -102,7 +78,6 @@
         on:click={updown(item)} 
         on:keydown={updown(item)}
         on:contextmenu|preventDefault={ctxm}
-        on:ctxm={showContextMenu}
 
         title="{item.title?item.title:(path+item.text)}"
         >
@@ -122,15 +97,10 @@
     </div>
     {#if item.nodes && item.expanded}
         <div style="margin-left:{options.parentsMarginLeft}; border-left:1px dotted #444; padding-left:{options.parentsMarginLeft}" transition:slide>
-            <SBLeaf data={item.nodes} level={level+1} path={path+item.text+"/"} on:ctxm={showContextMenu}/>
+            <svelte:self data={item.nodes} level={level+1} path={path+item.text+"/"} on:ctxm={raiseCtxm}/>
         </div>
     {/if}
 {/each}
 
     </div>
-
-    {#if level==0}
-        <ContextMenu {showMenu} {posx} {posy} />
-    {/if}
-            <svelte:window on:click={onPageClick} />
     
