@@ -29,20 +29,30 @@
 
     const dispatch = createEventDispatcher();
 
-    const ctxm = (e) => {
+    const ctxm = (e, item, path) => {
         let posx = e.clientX
         let posy = e.clientY
-        console.log("ctxm dispatch", level, e);
-        dispatch("ctxm", {level, posx, posy});
+        //console.log("ctxm dispatch", level, e, item, path);
+        dispatch("ctxm", {level, posx, posy, item, path});
     }
 
     const raiseCtxm = (e) => {
-        console.log("Raise ctxm", e)
+        //console.log("Raise ctxm", e)
         dispatch("ctxm", e.detail);
     }
 
+    const raiseOpenFile = (e) => {
+        //console.log("Raise openFile", e)
+        dispatch("openFile", e.detail);
+    }
+
     const updown = (item) => {
-        console.log(item)
+        //console.log(item)
+        if (!item.nodes) {
+            //is a file, need to dispatch an event
+            dispatch("openFile", {item, path: path+item.text})
+            return
+        }
         item.expanded = !item.expanded
         //item=item
         data=data
@@ -65,7 +75,7 @@
     .hovermenu {
         visibility: hidden;
     }
-    hover .hovermenu {
+    .hover .hovermenu {
         visibility: visible;
     }
 </style>
@@ -77,7 +87,7 @@
     <div class="item {item.nodes?"folder":"file"} {level==0?"sb-tree-level0":""}" role="button" tabindex="0" 
         on:click={updown(item)} 
         on:keydown={updown(item)}
-        on:contextmenu|preventDefault={ctxm}
+        on:contextmenu|preventDefault={(e)=>ctxm(e,item, path+item.text)}
 
         title="{item.title?item.title:(path+item.text)}"
         >
@@ -97,7 +107,7 @@
     </div>
     {#if item.nodes && item.expanded}
         <div style="margin-left:{options.parentsMarginLeft}; border-left:1px dotted #444; padding-left:{options.parentsMarginLeft}" transition:slide>
-            <svelte:self data={item.nodes} level={level+1} path={path+item.text+"/"} on:ctxm={raiseCtxm}/>
+            <svelte:self data={item.nodes} level={level+1} path={path+item.text+"/"} on:ctxm={raiseCtxm} on:openFile={raiseOpenFile}/>
         </div>
     {/if}
 {/each}

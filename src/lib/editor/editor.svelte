@@ -4,18 +4,21 @@
     import EditorTabs from './editorTabs.svelte';
     import { onDestroy, onMount } from 'svelte';
     let editorText = "Dummy"
+    export let tabsOpened;
 
-    let tabsOpened = [
-        {fn: "index.html", data: "<h1>Hello World</h1>", dirty:true},
-        {fn: "index.js", data: "console.log('Hello World')", active:true},
-        {fn: "index.css", dangling: true, data: "h1 {color: red}"}
-    ]
+
 
     let activeTab
-    onMount(() => {
+
+    const setEditorText = () => {
         activeTab = tabsOpened.filter(t => t.active)[0]
-        editorText = activeTab.data;
+        editorText = activeTab.data; 
+    }
+
+    onMount(() => {
+        setEditorText()
     })
+
 
 
     const selectTab = (event) => {
@@ -56,6 +59,7 @@ const fileEdited = (event) => {
 //when changed, the file contents are updated
 
 $: console.log("IDE SIZE", ideSize)
+$: setEditorText(tabsOpened)
 
 </script>
 

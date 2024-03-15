@@ -10,7 +10,7 @@
     import ContextMenu from "./contextMenu.svelte";
 
     let showMenu = false;
-
+    const dispatch = createEventDispatcher();
 
 
     let options = {
@@ -25,7 +25,7 @@
 
 
     const showContextMenu = (msg) => {
-        console.log("SCM", msg)
+        console.log("SCM", msg.detail)
         if (showMenu) {
             showMenu = false
             setTimeout(() => {
@@ -49,18 +49,24 @@
         showMenu = false
     }
 
+    const openFile = (e) => {
+        //console.log("Open file", e.detail)
+        //raise open file
+        dispatch("openFile", e.detail);
+    }
+
     //const dispatch = createEventDispatcher();
 
-    const ctxm = (e) => {
+    const ctxm = (e,item, path) => {
         let posx = e.clientX
         let posy = e.clientY
-        //console.log("ctxm, not dispatch, do it instead", level, e);
-        showContextMenu({detail: {level, posx, posy}}) //faked message
+        //console.log("ctxm, not dispatch, do it instead", level, );
+        showContextMenu({detail: {level, posx, posy, item, path}}) //faked message
         //dispatch("ctxm", {level, posx, posy});
     }
 
     const updown = (item) => {
-        console.log(item)
+        //console.log(item)
         item.expanded = !item.expanded
         //item=item
         data=data
@@ -101,7 +107,7 @@
     <div class="item {item.nodes?"folder":"file"} {level==0?"sb-tree-level0":""}" role="button" tabindex="0" 
         on:click={updown(item)} 
         on:keydown={updown(item)}
-        on:contextmenu|preventDefault={ctxm}
+        on:contextmenu|preventDefault={(e)=>ctxm(e,item, path+item.text)}
         on:ctxm={showContextMenu}
 
         title="{item.title?item.title:(path+item.text)}"
@@ -122,7 +128,7 @@
     </div>
     {#if item.nodes && item.expanded}
         <div style="margin-left:{options.parentsMarginLeft}; border-left:1px dotted #444; padding-left:{options.parentsMarginLeft}" transition:slide>
-            <SBLeaf data={item.nodes} level={level+1} path={path+item.text+"/"} on:ctxm={showContextMenu}/>
+            <SBLeaf data={item.nodes} level={level+1} path={path+item.text+"/"} on:ctxm={showContextMenu} on:openFile={openFile}/>
         </div>
     {/if}
 {/each}

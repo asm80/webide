@@ -1,5 +1,19 @@
 <script>
 
+	let tabsOpened = [
+        {fn: "index.html", data: "<h1>Hello World</h1>", dirty:true},
+        {fn: "index.js", data: "console.log('Hello World')", active:true},
+        {fn: "index.css", dangling: true, data: "h1 {color: red}"}
+    ]
+
+	const openFile = (e) => {
+		console.log("Open file", e.detail)
+		let item = e.detail.item
+		tabsOpened = tabsOpened.map(t => {t.active = false; return t})
+		tabsOpened.push({fn: item.text, data: "console.log('Hello World') //"+e.detail.path, active:true})
+		tabsOpened = tabsOpened
+	}
+
 	let ideSize="small"
 
 	import { SignIn, SignOut } from "@auth/sveltekit/components"
@@ -64,11 +78,11 @@
 <div class="columns is-fullheight">
 	<div class="column is-2 is-sidebar-menu scrollbar">
 		<aside class="amenu">
-			<SBTree data={treeData} />
+			<SBTree data={treeData} on:openFile={openFile}/>
 		</aside>
 	</div>
 	<div class="column is-8 ais-fullheight is-main-content p-0">
-		<Editor {ideSize} />
+		<Editor {ideSize} {tabsOpened}/>
 	</div>
 	<div class="column is-1 ">
 
