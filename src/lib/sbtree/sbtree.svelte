@@ -65,7 +65,7 @@
         //dispatch("ctxm", {level, posx, posy});
     }
 
-    const updown = (item) => {
+    const updown = (item, force=false) => {
         //console.log(item)
         item.expanded = !item.expanded
         //item=item
@@ -106,6 +106,7 @@
 {#each data as item, index}
     <div class="item {item.nodes?"folder":"file"} {level==0?"sb-tree-level0":""}" role="button" tabindex="0" 
         on:click={updown(item)} 
+        on:dblclick={updown(item, true)}
         on:keydown={updown(item)}
         on:contextmenu|preventDefault={(e)=>ctxm(e,item, path+item.text)}
         on:ctxm={showContextMenu}

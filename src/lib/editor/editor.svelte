@@ -10,8 +10,25 @@
 
     let activeTab
 
+    const findMaxOrder = () => {
+		let max = 0
+		for (let t of tabsOpened) {
+			if (t.order > max) {
+				max = t.order
+			}
+		}
+		return max
+	}
+
     const setEditorText = () => {
         activeTab = tabsOpened.filter(t => t.active)[0]
+        //if no active tab, select the first one
+        if (!activeTab) {
+            //select the tab with highest order
+            let max = findMaxOrder()
+           activeTab = tabsOpened.filter(t => t.order == max)[0]
+           activeTab.active = true
+        }
         editorText = activeTab.data; 
     }
 
@@ -29,6 +46,8 @@
     }
     tab.active = true;
     tabsOpened = tabsOpened;
+    let maxOrder = findMaxOrder()
+    if (activeTab.order<maxOrder) activeTab.order = maxOrder+1
     console.log("Selected tab", tab)
     editorText = tab.data;
 }
@@ -43,7 +62,7 @@ const closeTab = (event) => {
 const saveFile = (event) => {
     let data = event.detail
 
-    console.log("Saved file", data, activeTab)
+    //console.log("Saved file", data, activeTab)
     activeTab.dirty = false
     tabsOpened = tabsOpened
 }
@@ -51,6 +70,7 @@ const fileEdited = (event) => {
     let data = event.detail
     activeTab.data = data
     activeTab.dirty = true
+    activeTab.dangling = false
     tabsOpened = tabsOpened
 }
 

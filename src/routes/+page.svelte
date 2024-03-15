@@ -6,11 +6,54 @@
         {fn: "index.css", dangling: true, data: "h1 {color: red}"}
     ]
 
+	//find max order number, or 0 if no order given
+	const findMaxOrder = () => {
+		let max = 0
+		for (let t of tabsOpened) {
+			if (t.order > max) {
+				max = t.order
+			}
+		}
+		return max
+	}
+
+	const recountOrder = () => {
+		let maxOrder = findMaxOrder()
+		//from left to right, skip tabs with order given
+		//assign maxOrder+1 to the rest, raise maxOrder
+		for (let t of tabsOpened) {
+			if (typeof t.order == "undefined") {
+				maxOrder++
+				t.order = maxOrder
+			}
+		}
+		//all tabs has its own order
+		//todo: normalize?
+
+		tabsOpened = tabsOpened
+	}
+
+	//todo: distinct click and dblclick
+
 	const openFile = (e) => {
 		console.log("Open file", e.detail)
 		let item = e.detail.item
+		let force = e.detail.force
 		tabsOpened = tabsOpened.map(t => {t.active = false; return t})
-		tabsOpened.push({fn: item.text, data: "console.log('Hello World') //"+e.detail.path, active:true})
+		//if there is a dangling tab and not forced, replace it, else push new tab
+		if (tabsOpened.filter(t => t.dangling).length > 0 && !force) {
+			tabsOpened = tabsOpened.map(t => {
+				if (t.dangling) {
+					t.fn = item.text
+					t.data = "console.log('Hello World') // Path:"+e.detail.path
+					t.active = true
+				}
+				return t
+			})
+		} else 
+		{
+			tabsOpened.push({fn: item.text, data: "console.log('Hello World') //"+e.detail.path, active:true})
+		}
 		tabsOpened = tabsOpened
 	}
 
@@ -31,6 +74,7 @@
 
 	onMount(() => {
 		console.log("Mounted")
+		recountOrder()
 		const container = document.getElementById("fileTabs");
 		// where "container" is the id of the container
   		container.addEventListener("wheel", function (e) {

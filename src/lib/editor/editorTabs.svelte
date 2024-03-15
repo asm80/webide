@@ -70,7 +70,7 @@ const closeTab = (tab) => {
     <ul>
         {#each tabsOpened as tab}
             <li class="{tab.active?'is-active':''} {tab.dangling?"dangling":""} {tab.dirty?"dirty":""}">
-                <a on:click={() => selectTab(tab)}>{lastElementOfFileName(tab.fn)}&nbsp;<i on:click={()=>closeTab(tab)} class="fa-solid fa-xmark"></i><i class="fa-solid fa-circle"></i></a>
+                <a on:click={() => selectTab(tab)}>{lastElementOfFileName(tab.fn)}{tab.order}&nbsp;<i on:click={()=>closeTab(tab)} class="fa-solid fa-xmark"></i><i class="fa-solid fa-circle"></i></a>
             </li>
         {/each}
     </ul>

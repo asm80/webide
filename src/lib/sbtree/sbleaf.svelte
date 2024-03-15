@@ -46,11 +46,11 @@
         dispatch("openFile", e.detail);
     }
 
-    const updown = (item) => {
+    const updown = (item, force=false) => {
         //console.log(item)
         if (!item.nodes) {
             //is a file, need to dispatch an event
-            dispatch("openFile", {item, path: path+item.text})
+            dispatch("openFile", {item, path: path+item.text, force})
             return
         }
         item.expanded = !item.expanded
@@ -86,6 +86,7 @@
 {#each data as item, index}
     <div class="item {item.nodes?"folder":"file"} {level==0?"sb-tree-level0":""}" role="button" tabindex="0" 
         on:click={updown(item)} 
+        on:dblclick={updown(item,true)}
         on:keydown={updown(item)}
         on:contextmenu|preventDefault={(e)=>ctxm(e,item, path+item.text)}
 
