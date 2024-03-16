@@ -33,6 +33,26 @@
         editorText = activeTab.data; 
     }
 
+    const changedTab = (newTabs) => {
+        console.log("Changed tab", activeTab)
+        //find the "just opened" tab and set it as active
+        let justOpened = newTabs.filter(t => t.justOpened)
+        if (justOpened.length > 0) {
+            activeTab = justOpened[0]
+            delete activeTab.justOpened
+            setEditorText()
+            return
+        }
+        if (activeTab && !activeTab.active) {
+            setEditorText()
+            return
+        }
+        if (activeTab && activeTab.active && activeTab.justOpened) {
+            delete activeTab.justOpened
+            setEditorText()
+        }
+    }
+
     onMount(() => {
         setEditorText()
     })
@@ -42,6 +62,9 @@
     const selectTab = (event) => {
         let tab = event.detail
         activeTab = tab
+        if (activeTab.active) {
+            activeTab.dangling = false
+        }
     for (let t of tabsOpened) {
         t.active = false;
     }
@@ -81,9 +104,10 @@ const fileEdited = (event) => {
 //when changed, the file contents are updated
 
 $: console.log("IDE SIZE", ideSize)
-$: setEditorText(tabsOpened)
+//$: setEditorText(tabsOpened)
+$: changedTab(tabsOpened)
 
 </script>
 
 <EditorTabs tabsOpened={tabsOpened} on:selectTab={selectTab} on:closeTab={closeTab}/>
-<Monaco {ideSize} editorText={editorText} on:saveFile={saveFile} on:fileEdited={fileEdited} />
+<Monaco {ideSize} {editorText} on:saveFile={saveFile} on:fileEdited={fileEdited} />

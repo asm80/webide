@@ -8,6 +8,9 @@ $darker: rgb(20, 20, 20);
 
 
 $navbar-height: 2.5rem;
+$navbar-item-color: white;
+$navbar-dropdown-background-color: $dark;
+$navbar-item-hover-background-color: $less-dark;
 
 $footer-height: 0.75rem;
 
@@ -105,4 +108,8 @@ body.dark button {
   }
   .is-main-content {
     //background: $grey-lighter;
+  }
+
+  .container.is-fluid {
+    padding: 0 30px !important
   }

@@ -14,9 +14,14 @@
     <div id="navbarBasicExample" class="navbar-menu">
       <div class="navbar-start">
         <a class="navbar-item" href="/">
-          Home
+          File
         </a>
-  
+
+                <a class="navbar-item" href="/">
+                  Edit
+                </a>
+        
+
         <a class="navbar-item" href="/">
           Docs
         </a>

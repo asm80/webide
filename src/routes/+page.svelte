@@ -41,28 +41,65 @@
 
 	//todo: distinct click and dblclick
 
+	const deactivateAllTabs = () => {
+		tabsOpened = tabsOpened.map(t => {t.active = false; return t})
+	}
+
 	const openFile = async (e) => {
 		console.log("Open file", e.detail)
 		let item = e.detail.item
 		let force = e.detail.force
+		let path = e.detail.path
 		tabsOpened = tabsOpened.map(t => {t.active = false; return t})
 
-		let newData = await data.fs.readFile(item.text.replace("/My Project/",""))
-		console.log("newData", newData)
+		let newData = "";
+		try {
+			newData = await data.fs.readFile(item.text.replace("/My Project/",""))
+		} catch (e) {
+			;
+		}
+		//console.log("newData", newData)
+
+		let newOrder = findMaxOrder() + 1
+
+		//if there is a tab with this file (by path), just active it!
+		let found = tabsOpened.filter(t => t.path == path)
+		if (found.length > 0) {
+			console.log("Found Just Switch Tabs", found)
+			deactivateAllTabs()
+			found[0].active = true
+			found[0].justOpened = true
+			tabsOpened = tabsOpened
+			return
+		}
+
 
 		//if there is a dangling tab and not forced, replace it, else push new tab
 		if (tabsOpened.filter(t => t.dangling).length > 0 && !force) {
+			deactivateAllTabs()
 			tabsOpened = tabsOpened.map(t => {
 				if (t.dangling) {
 					t.fn = item.text
 					t.data = newData
 					t.active = true
+					t.justOpened = true;
+					t.path = path
+					
 				}
 				return t
 			})
 		} else 
 		{
-			tabsOpened.push({fn: item.text, data: newData, active:true})
+			deactivateAllTabs()
+			tabsOpened.push({
+				fn: item.text, 
+				data: newData, 
+				active:true, 
+				justOpened:true, 
+				path: path,
+				order: newOrder,
+				dangling: true
+			})
 		}
 		tabsOpened = tabsOpened
 	}
@@ -83,7 +120,7 @@
 	import { onMount } from 'svelte';
 
 	onMount(() => {
-		console.log("Mounted")
+		//console.log("Mounted")
 		recountOrder()
 		const container = document.getElementById("fileTabs");
 		// where "container" is the id of the container

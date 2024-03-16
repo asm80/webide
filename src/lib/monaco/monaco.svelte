@@ -49,6 +49,8 @@ const saveFile = (content) => {
 	dispatch("saveFile", content);
 }
 
+let prevTab = null
+
 function loadCode(code, language) {
 		model = monaco.editor.createModel(code, language);
 
@@ -104,7 +106,7 @@ function loadCode(code, language) {
 //*****----*/
 
 const changeEditorText = (editorText) => {
-    //console.log("Changing editor text", editorText)
+    console.log("Changing editor text", editorText)
     //editorText = editorText
 	doNotCheckOnChange = true
     editor?.getModel().setValue(editorText);
