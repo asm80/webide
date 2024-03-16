@@ -1,10 +1,16 @@
 <script>
 
+	export let data;
+
 	let tabsOpened = [
         {fn: "index.html", data: "<h1>Hello World</h1>", dirty:true},
         {fn: "index.js", data: "console.log('Hello World')", active:true},
         {fn: "index.css", dangling: true, data: "h1 {color: red}"}
     ]
+
+	console.log(data.fs)
+	//data.fs.writeFile("project.toml", "test=0")
+	//data.lsconn.setItem("test","testic")
 
 	//find max order number, or 0 if no order given
 	const findMaxOrder = () => {
@@ -35,24 +41,28 @@
 
 	//todo: distinct click and dblclick
 
-	const openFile = (e) => {
+	const openFile = async (e) => {
 		console.log("Open file", e.detail)
 		let item = e.detail.item
 		let force = e.detail.force
 		tabsOpened = tabsOpened.map(t => {t.active = false; return t})
+
+		let newData = await data.fs.readFile(item.text.replace("/My Project/",""))
+		console.log("newData", newData)
+
 		//if there is a dangling tab and not forced, replace it, else push new tab
 		if (tabsOpened.filter(t => t.dangling).length > 0 && !force) {
 			tabsOpened = tabsOpened.map(t => {
 				if (t.dangling) {
 					t.fn = item.text
-					t.data = "console.log('Hello World') // Path:"+e.detail.path
+					t.data = newData
 					t.active = true
 				}
 				return t
 			})
 		} else 
 		{
-			tabsOpened.push({fn: item.text, data: "console.log('Hello World') //"+e.detail.path, active:true})
+			tabsOpened.push({fn: item.text, data: newData, active:true})
 		}
 		tabsOpened = tabsOpened
 	}
@@ -92,6 +102,15 @@
 // That will work perfectly
 	})
 
+	const buttonTest = async () => {
+		console.log("Button test")
+		console.log($page.data.session)
+		let sess = $page.data.session
+		let user = sess.user
+		const res = await fetch(`/api/${user.userName}/MyProject/file/1/hejhola/vola.asm80`);
+		const item = await res.text();
+		console.log(item)
+	}
 
 </script>
 
@@ -126,7 +145,7 @@
 		</aside>
 	</div>
 	<div class="column is-8 ais-fullheight is-main-content p-0">
-		<Editor {ideSize} {tabsOpened}/>
+		<Editor {ideSize} {tabsOpened} fs={data.fs}/>
 	</div>
 	<div class="column is-1 ">
 
@@ -138,10 +157,10 @@
 		alt="User Avatar"
 	  />
 	{/if}
-	{JSON.stringify($page.data.session)}
+	
 	<span class="signedInText">
 	  <small>Signed in as</small><br />
-	  <strong>{$page.data.session.user?.name ?? "User"}</strong>
+	  <strong>{$page.data.session.user?.userName ?? "User"}</strong>
 	</span>
 	<SignOut>
 	  <div slot="submitButton" class="buttonPrimary">Sign out</div>
@@ -159,7 +178,7 @@
 			<option>big</option>
 		</select>
 
-
+		<button class="button" on:click={buttonTest}>AnyButton</button>
 	</div>
 
 </div>

@@ -13,6 +13,7 @@
 		"format": "prettier --write --plugin prettier-plugin-svelte ."
 	},
 	"devDependencies": {
+		"@asm80/filesystem": "^1.0.1",
 		"@auth/core": "^0.28.0",
 		"@auth/sveltekit": "^0.14.0",
 		"@sveltejs/adapter-auto": "^3.0.0",
@@ -23,6 +24,7 @@
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.35.1",
 		"monaco-editor": "^0.44.0",
+		"mongodb": "^6.5.0",
 		"postcss": "^8.4.32",
 		"prettier": "^3.1.0",
 		"prettier-plugin-svelte": "^3.1.2",

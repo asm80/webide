@@ -5,6 +5,9 @@ import { AUTH0_DOMAIN, AUTH0_ID, AUTH0_SECRET } from "$env/static/private";
 //import GitHub from "@auth/sveltekit/providers/github"
 //import { GITHUB_ID, GITHUB_SECRET } from "$env/static/private"
 
+import { getDB } from '$db/mongo';
+const db = getDB();
+
 const config = {
     providers: [
         Auth0Provider({
@@ -37,6 +40,32 @@ const config = {
             //console.log('session',session, token)
             session.user.id = token.accountId;
             //session.user = { id: user.id,name: user.name,email: user.email,image: user.image}; 
+            let su = session.user
+            await db.collection('users').updateOne({ id: su.id }, { $set: su }, { upsert: true});
+            const user = await db.collection('users').findOne({ id: su.id });
+
+            session.user = user;
+
+            if (!user.userName) { 
+              //try to make an user name. Let take an user name and de-accent it
+              let userName = su.name;
+              userName = userName.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+              userName = userName.toLowerCase();
+              userName = userName.replace(/\s+/g, "_");
+
+              //isolate the "|nnn" part from su.id
+              let sysid = su.id.split("|");
+              userName+="_"+(sysid[1]?sysid[1]:"");
+
+              //update the user name
+              await db.collection('users').updateOne({ id: user.id }, { $set: { userName: userName } }, { upsert: true});
+              session.user.userName = userName;
+            }
+
+            //console.log(user)
+
+            
+
             return session
         }
     }

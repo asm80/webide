@@ -6,6 +6,7 @@
     let editorText = "Dummy"
     export let tabsOpened;
 
+    export let fs;
 
 
     let activeTab
@@ -59,10 +60,11 @@ const closeTab = (event) => {
     tabsOpened = tabsOpened; //do reactivity things
 }
 
-const saveFile = (event) => {
+const saveFile = async (event) => {
     let data = event.detail
 
-    //console.log("Saved file", data, activeTab)
+    console.log("Saved file", data, activeTab)
+    await fs.writeFile(activeTab.fn.replace("/My Project/",""), data)
     activeTab.dirty = false
     tabsOpened = tabsOpened
 }

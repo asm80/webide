@@ -2,6 +2,10 @@ export const treeData = [
         {text:"My Project",
         hoverMenu: true,
                     nodes: [
+                                                        {
+                                                            icon: "fa-regular fa-file",
+                                                            text: "project.toml"
+                                                        },
                         {
                             text: "src",
                             icon: "fa-regular fa-folder",
