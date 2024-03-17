@@ -4,6 +4,7 @@
 
 $dark: rgb(20, 20, 20);
 $less-dark: rgb(40, 40, 40);
+$middark: rgb(60, 60, 60);
 $darker: rgb(20, 20, 20);
 
 
@@ -112,4 +113,35 @@ body.dark button {
 
   .container.is-fluid {
     padding: 0 30px !important
+  }
+
+  // dialog fixes
+  .dialog__overlay .dialog__container {
+    background-color: $middark !important;
+  }
+
+  .dialog__form-element label.dialog__input-label {
+    color: $white !important;
+    background-color: $less-dark !important;
+  }
+
+  .dialog__form-element .dialog__input, 
+  .dialog__form-element .dialog__input:not([type=checkbox]):not([type=radio]),
+  .dialog__form-element .dialog__input:focus, 
+  .dialog__form-element .dialog__input:active,
+  .dialog__form-element .dialog__input:not([type=checkbox]):not([type=radio]):active,
+  .dialog__form-element .dialog__input:not([type=checkbox]):not([type=radio]):focus {
+    color: $white !important;
+    background-color: $less-dark !important;
+    border:1px solid $dark !important;
+  }
+
+
+  // nav
+  nav {
+    border-bottom: 1px solid $middark;
+  }
+
+  footer {
+    border-top: 1px solid $middark;
   }

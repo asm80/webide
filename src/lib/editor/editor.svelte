@@ -144,8 +144,8 @@ const fileEdited = (event) => {
 
 const saveFileAs = async (event) => {
     let data = event.detail
-    console.log("Save file as", data)
-    let newName = await dialogs.prompt("Save file as", activeTab.fn)
+    let newName = await dialogs.prompt("File name", {title:"Save file as", submitButtonText:"Save", resetButton:false})
+    if (!newName) return
     let path = activeTab.path
     let newPath = replaceFilename(path, newName)
     activeTab.fn = newName
