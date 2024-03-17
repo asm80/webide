@@ -16,6 +16,7 @@
 		"@asm80/filesystem": "^1.0.5",
 		"@auth/core": "^0.28.0",
 		"@auth/sveltekit": "^0.14.0",
+		"@ltd/j-toml": "^1.38.0",
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",

@@ -1,9 +1,10 @@
 //converts file list to tree data for treeview
 
-let expanded = {}
+let expandedFolders = {}
+import { fixForSave } from '$util/files.js'
 
 export const setExpanded = (path, expandedState) => {
-    expanded[path] = expandedState
+    expandedFolders[path] = expandedState
     console.log("setExpanded",path,expandedState)
 }
 
@@ -17,14 +18,16 @@ const buildOneLevel = async (filelist, path,fs) => {
     //directories first
 
     for (let file of filelist) {
+        
         if (file.endsWith("/")) {
             let expanded = false
             let folder = path+file
-            console.log("Checking expanded",folder,expanded[folder+"/"])
-            if (expanded[folder+"/"]) {
+            console.log("Checking expanded",folder,expandedFolders[folder],expandedFolders)
+            if (expandedFolders[folder]) {
                 expanded = true
             }
-            let subList = await fs.readdir(folder)
+            let subList = await fs.readdir(fixForSave(folder))
+            console.log("sublist",folder, subList)
             let subTree = await buildOneLevel(subList, folder,fs)
             tree.push({icon: "fa-regular fa-folder", text: file.substr(0,file.length-1), nodes: subTree, expanded: expanded})
         }
@@ -33,45 +36,54 @@ const buildOneLevel = async (filelist, path,fs) => {
     //then files
     
     for (let file of filelist) {
+        if (file.startsWith("..")) continue
         if (!file.endsWith("/")) {
-            tree.push({icon: "fa-regular fa-file", text: file})
+            tree.push({icon: "fa-regular fa-file", text: file, path: path+file})
         }
     }
     return tree
 }
 
-export const buildTree = async (fileList,fs) => {
+export const buildTree = async (fileList, fs, project) => {
 
-     let tree = await buildOneLevel(fileList, "",fs)
+    console.log("buildTree Now")
+
+    let projectName = project.name
+    let projectPath = `/${projectName}/`
+
+     let tree = await buildOneLevel(fileList, projectPath,fs)
  
     //default data
     const treeData = [
         {   
-            text:"My Project",
+            text:projectName,
             hoverMenu: true,
             nodes: tree,
             expanded:true,
+            disableCtx: true,
+            path:projectPath,
             id: "project"
         },
         {
             text: "Workspace",
             icon: "fa-regular fa-folder",
+            disableCtx: true,
             title: "Open workspaces"
         },
         {
-            icon: "fa fa-archive fa-fw",
+            disableCtx: true,
             text: "Online"
         },
         {
-            icon: "fa fa-calendar fa-fw",
+            disableCtx: true,
             text: "Terminal"
         },
         {
-            icon: "fa fa-address-book fa-fw",
+            disableCtx: true,
             text: "Demos"
         },
         {
-            icon: "fa fa-trash fa-fw",
+            disableCtx: true,
             text: "Settings"
         }
     ];

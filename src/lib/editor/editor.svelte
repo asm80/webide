@@ -5,6 +5,7 @@
     import EditorTabs from './editorTabs.svelte';
     import { onDestroy, onMount } from 'svelte';
     import { replaceFilename, fixForSave } from "$util/files.js"
+    import { createEventDispatcher } from "svelte";
     let editorText = "Dummy"
     export let tabsOpened;
 
@@ -12,6 +13,7 @@
 
 
     let activeTab
+    const dispatch = createEventDispatcher();
 
     const findMaxOrder = () => {
 		let max = 0
@@ -63,6 +65,10 @@
     }
 
     const setEditorText = () => {
+        if (tabsOpened.length == 0) {
+            editorText = "//Open or create a file to start coding"
+            return
+        }
         activeTab = tabsOpened.filter(t => t.active)[0]
         //if no active tab, select the first one
         if (!activeTab) {
@@ -75,7 +81,7 @@
     }
 
     const changedTab = (newTabs) => {
-        console.log("Changed tab", activeTab)
+        console.log("Changed tab", activeTab, tabsOpened)
         //find the "just opened" tab and set it as active
         let justOpened = newTabs.filter(t => t.justOpened)
         if (justOpened.length > 0) {
@@ -116,13 +122,21 @@
     console.log("Selected tab", tab)
     recountOrders()
     editorText = tab.data;
+    dispatch("selectTab", tab)
 }
 
 const closeTab = (event) => {
     let tab = event.detail
-    tabsOpened = tabsOpened.filter(t => t.fn != tab.fn); 
+    tabsOpened = tabsOpened.filter(t => t.path != tab.path); 
     console.log("Close tab", tab, tabsOpened)
     recountOrders()
+    //activate tab with highest order
+    let max = findMaxOrder()
+    let newActive = tabsOpened.filter(t => t.order == max)[0]
+    if (newActive) {
+        newActive.active = true
+        editorText = tab.data;
+    }
     tabsOpened = tabsOpened; //do reactivity things
 }
 
@@ -169,7 +183,7 @@ $: changedTab(tabsOpened)
 <EditorTabs 
     tabsOpened={tabsOpened} 
     on:selectTab={selectTab} 
-    on:closeTab={closeTab}
+    on:closeTab={(e)=>dispatch("closeTab", e.detail)}
 />
 
 <Monaco 

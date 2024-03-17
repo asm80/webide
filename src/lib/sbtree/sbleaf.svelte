@@ -6,6 +6,7 @@
     export let data;
     export let level=0;
     export let path="/"
+    export let cursor="";
 
 
     let showMenu = false;
@@ -70,6 +71,9 @@
         cursor: pointer;
        /*margin-right: 5px;*/
     }
+    div.item.cursor {
+        background-color: #444;
+    }
     .sb-tree-level0 {
         /*font-weight: bold;*/
         text-transform: uppercase;
@@ -85,9 +89,8 @@
 
     <div class="{level==0?"sb-tree-wrapper":""}">
 
-
 {#each data as item, index}
-    <div class="item {item.nodes?"folder":"file"} {level==0?"sb-tree-level0":""}" role="button" tabindex="0" 
+    <div class="item {item.nodes?"folder":"file"} {level==0?"sb-tree-level0":""} {(item.path==cursor)?"cursor":""}" role="button" tabindex="0" 
         on:click={updown(item)} 
         on:dblclick={updown(item,true)}
         on:keydown={updown(item)}
@@ -111,7 +114,7 @@
     </div>
     {#if item.nodes && item.expanded}
         <div style="margin-left:{options.parentsMarginLeft}; border-left:1px dotted #444; padding-left:{options.parentsMarginLeft}" transition:slide>
-            <svelte:self data={item.nodes} level={level+1} path={path+item.text+"/"} on:ctxm={raiseCtxm} on:openFile={raiseOpenFile}/>
+            <svelte:self cursor={cursor} data={item.nodes} level={level+1} path={path+item.text+"/"} on:ctxm={raiseCtxm} on:openFile={raiseOpenFile}/>
         </div>
     {/if}
 {/each}

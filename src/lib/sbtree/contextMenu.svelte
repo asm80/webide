@@ -1,7 +1,10 @@
 <script>
+    import { createEventDispatcher } from "svelte";
     export let showMenu = false;
     export let posx;
     export let posy;
+    export let ctxPath;
+    export let itemType;
     // pos is cursor position when right click occur
     let pos = { x: 0, y: 0 }
     // menu is dimension (height and width) of context menu
@@ -12,6 +15,8 @@
     //let showMenu = false;
     // to display some text
     let content;
+
+    const dispatch = createEventDispatcher();
 
 
     function getContextMenuDimension(node){
@@ -25,10 +30,11 @@
         }
     }
 
-    let dummyHandler = (e) => {
+    let dummyHandler = (e, action) => {
         // This function will handle right click event
         // and display context menu
-        console.log("Menu Action E", e)
+        //console.log("Menu Action E", e, action, ctxPath)
+        dispatch("ctxAction", {action, path: ctxPath, itemType})
     }
 
     const changeState = (state) => {
@@ -41,7 +47,7 @@
             h: window.innerHeight
         };
         pos = {
-            x: 0, //posx,
+            x: 100, //posx,
             y: posy
         };
         // If bottom part of context menu will be displayed
@@ -63,37 +69,40 @@
     let menuItems = [
         {
             'name': 'addItem',
-            'onClick': dummyHandler,
-            'displayText': "Add Item",
-            'class': 'fa-solid fa-plus'
+            'onClick': (e)=>dummyHandler(e,"additem"),
+            'displayText': "Add File",
+            'class': 'fa-solid fa-file-circle-plus'
         },
         {
-            'name': 'emptyicons',
-            'onClick': dummyHandler,
-            'displayText': "Empty Icon",
-            'class': 'fa-solid fa-square'
+            'name': 'addFolder',
+            'onClick': (e)=>dummyHandler(e,"addfolder"),
+            'displayText': "Add Folder",
+            'class': 'fa-solid fa-folder-plus'
         },
         {
-            'name': 'zoom',
-            'onClick': dummyHandler,
-            'displayText': "Zoom",
-            'class': 'fa-solid fa-magnifying-glass'
+            'name': 'rename',
+            'onClick': (e)=>dummyHandler(e,"rename"),
+            'displayText': "Rename",
+            'class': 'fa-solid fa-shuffle'
         },
+        /*
         {
             'name': 'printMenu',
             'onClick': dummyHandler,
             'displayText': "Print",
             'class': 'fa-solid fa-print'
         },
+        
         {
             'name': 'settings',
             'onClick': dummyHandler,
             'displayText': "Settings",
             'class': 'fa-solid fa-gear'
         },
+        */
         {
             'name': 'trash',
-            'onClick': dummyHandler,
+            'onClick': (e)=>dummyHandler(e,"deleteitem"),
             'displayText': "Trash",
             'class': 'fa-solid fa-trash-can'
         },
@@ -120,7 +129,7 @@
         <ul class="menu-list">
             {#each menuItems as item}
 
-                    <li><a on:click={item.onClick}><i class={item.class}></i>{item.displayText}</a></li>
+                    <li><a on:click={item.onClick}><i class={item.class}></i>&nbsp;{item.displayText}</a></li>
             {/each}
         </ul>
 </div>

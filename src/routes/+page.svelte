@@ -3,25 +3,65 @@
 	export let data;
 	import {buildTree} from '$lib/shared/buildTree.js'
 	import { localfs } from '$lib/shared/stores/localfs.js'
+	import { dialogs } from "svelte-dialogs";
 
 	import { treeData as defaultTreeData } from '../test-tree';
+	import {fixForSave, extractDir, extractFilename, replaceFilename} from "$util/files.js"
 	let treeData = defaultTreeData
+
+	let ideSize="small"
+
+	import { SignIn, SignOut } from "@auth/sveltekit/components"
+	import { page } from "$app/stores"
+
+	import Editor from '$lib/editor/editor.svelte';
+
+	import Nav from '$lib/nav.svelte';
+	import SBTree from '$lib/sbtree/sbtree.svelte';
+	import Footer from '$lib/footer.svelte';
+
+	import { onMount } from 'svelte';
+	import {recountOrders} from "$util/tabs.js"
+
+	import * as TOML from '@ltd/j-toml';
 	
 
-	let tabsOpened = [
-        {fn: "index.html", path:"/My Project/index.html", data: "<h1>Hello World</h1>", dirty:true},
-        {fn: "index.js", path:"/My Project/index.js", data: "console.log('Hello World')", active:true},
-        {fn: "index.css", path:"/My Project/index.css", dangling: true, data: "h1 {color: red}"}
-    ]
+	let tabsOpened = []
 
-	const rebuildTree = async() => {
+	
+	let cursor=""; //path of edited file
+
+	//lazy rebuild
+	let lastFilenum = -1
+
+	const rebuildTree = async(forced=false) => {
 		let res = await data.fs.readdir("")
 		console.log("RES", res)
-		treeData = await buildTree(res,data.fs)
+		if (res.length == lastFilenum && !forced) return
+		console.log("Rebuild tree")
+		lastFilenum = res.length
+		treeData = await buildTree(res, data.fs, project)
 	}
-	localfs.subscribe(rebuildTree)
 	rebuildTree()
 
+	let project = {
+		name:"My Project"
+	}
+
+	//find _project.toml and parse it
+	//if not found, create it
+
+	const projectInit = async () => {
+		let projectToml = TOML.parse(await data.fs.readFile("_project.toml"))
+		//console.log("Project toml", projectToml)
+		project = projectToml
+	}
+
+	
+	projectInit()
+
+		localfs.subscribe(rebuildTree)
+	
 	//data.fs.writeFile("project.toml", "test=0")
 	//data.lsconn.setItem("test","testic")
 
@@ -63,15 +103,17 @@
 		let item = e.detail.item
 		let force = e.detail.force
 		let path = e.detail.path
-		tabsOpened = tabsOpened.map(t => {t.active = false; return t})
+		deactivateAllTabs()
 
 		let newData = "";
 		try {
-			newData = await data.fs.readFile(item.text.replace("/My Project/",""))
+			console.log("Reading file", item, fixForSave(item.path))
+			newData = await data.fs.readFile(fixForSave(item.path))
 		} catch (e) {
 			;
 		}
 		//console.log("newData", newData)
+		console.log("before", tabsOpened)
 
 		let newOrder = findMaxOrder() + 1
 
@@ -83,6 +125,7 @@
 			found[0].active = true
 			found[0].justOpened = true
 			tabsOpened = tabsOpened
+			cursor = found[0].path
 			return
 		}
 
@@ -97,6 +140,7 @@
 					t.active = true
 					t.justOpened = true;
 					t.path = path
+					cursor = path
 					
 				}
 				return t
@@ -113,24 +157,11 @@
 				order: newOrder,
 				dangling: true
 			})
+			cursor = path
 		}
 		tabsOpened = tabsOpened
 	}
 
-	let ideSize="small"
-
-	import { SignIn, SignOut } from "@auth/sveltekit/components"
-	import { page } from "$app/stores"
-
-	import Editor from '$lib/editor/editor.svelte';
-
-	import Nav from '$lib/nav.svelte';
-	import SBTree from '$lib/sbtree/sbtree.svelte';
-	import Footer from '$lib/footer.svelte';
-
-	//import { treeData } from '../test-tree';
-
-	import { onMount } from 'svelte';
 
 	onMount(() => {
 		//console.log("Mounted")
@@ -162,6 +193,83 @@
 		console.log(item)
 	}
 
+	const closeTab = (event) => {
+		let tab = event.detail
+		tabsOpened = tabsOpened.filter(t => t.path != tab.path); 
+		console.log("Close tab", tab, tabsOpened)
+		recountOrders(tabsOpened)
+		//activate tab with highest order
+		let max = findMaxOrder()
+		let newActive = tabsOpened.filter(t => t.order == max)[0]
+		if (newActive) {
+			newActive.active = true
+			//editorText = tab.data;
+		}
+		tabsOpened = tabsOpened; //do reactivity things
+	}
+
+	const selectTab = (event) => {
+		console.log("Select Tab Top Level", event.detail)
+		cursor = event.detail.path
+	}
+
+	const ctxAction = async (event) => {
+		let {action, path, itemType} = event.detail
+		let dir;
+		let name;
+		switch (action) {
+			case "deleteitem":
+				
+				let result = await dialogs.confirm("Are you sure you want to delete '"+fixForSave(path)+"'?", "Delete file")
+				if (!result) return
+				console.log("Delete item", path, result)
+				if (itemType == "file") {
+					await data.fs.unlink(fixForSave(path))
+				} else {
+					let filelist = await data.fs.readdir(fixForSave(path))
+					console.log("To Delete", filelist)
+					for (let fn of filelist) {
+						await data.fs.unlink(fixForSave(path+"/"+fn))
+					}
+					
+				}
+				//remove path from tabs, if there is
+				tabsOpened = tabsOpened.filter(t => t.path != path)
+				rebuildTree()
+				break;
+			case "additem":
+				dir = path;
+				if (itemType == "file") {
+					dir = extractDir(path)
+				}
+				name = await dialogs.prompt("File name", {title:"Create file in "+(dir), submitButtonText:"Create", resetButton:false})
+				if (!name) return
+				console.log("Add item", name)
+				await data.fs.writeFile(fixForSave(dir+"/"+name), "")
+				rebuildTree()
+				break;
+			case "addfolder":
+				dir = path;
+				if (itemType == "file") {
+					dir = extractDir(path)
+				}
+				name = await dialogs.prompt("File name", {title:"Create folder in "+(dir), submitButtonText:"Create", resetButton:false})
+				if (!name) return
+				await data.fs.writeFile(fixForSave(dir+"/"+name+"/..empty"), "")
+				rebuildTree()
+				break;
+			case "rename":
+
+				name = await dialogs.prompt("New name", {title:"Rename "+extractFilename(path), submitButtonText:"Rename", resetButton:false})
+				if (!name) return
+				let newPath = replaceFilename(path, name)
+				console.log("rename item", path, newPath)
+				await data.fs.rename(fixForSave(path), fixForSave(newPath))
+				rebuildTree(true)
+				break;
+		}
+	}
+
 </script>
 
 <style>
@@ -191,11 +299,11 @@
 <div class="columns is-fullheight">
 	<div class="column is-2 is-sidebar-menu scrollbar">
 		<aside class="amenu">
-			<SBTree data={treeData} on:openFile={openFile}/>
+			<SBTree data={treeData} cursor={cursor} project={project} on:openFile={openFile} on:ctxAction={ctxAction}/>
 		</aside>
 	</div>
 	<div class="column is-8 ais-fullheight is-main-content p-0">
-		<Editor {ideSize} {tabsOpened} fs={data.fs}/>
+		<Editor {ideSize} {tabsOpened} on:closeTab={closeTab} on:selectTab={selectTab} fs={data.fs}/>
 	</div>
 	<div class="column is-2 ">
 

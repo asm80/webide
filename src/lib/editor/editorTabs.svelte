@@ -32,10 +32,16 @@ const closeTab = (tab) => {
 </script>
 
 <style>
+    
     .dangling a {
         font-style: italic;
         color: #ddd
     }
+    .is-active.dangling a {
+        font-style: italic;
+        color: gold
+    }
+    
     .tabs li a i {
         width:10px
     }
@@ -70,7 +76,20 @@ const closeTab = (tab) => {
     <ul>
         {#each tabsOpened as tab}
             <li class="{tab.active?'is-active':''} {tab.dangling?"dangling":""} {tab.dirty?"dirty":""}">
-                <a on:click={() => selectTab(tab)}>{lastElementOfFileName(tab.path)}&nbsp;<i on:click={()=>closeTab(tab)} class="fa-solid fa-xmark"></i><i class="fa-solid fa-circle"></i></a>
+                <a 
+                on:click={() => selectTab(tab)}
+                on:keydown={(e) => {if (e.key == "Enter") selectTab(tab)}}
+                role="button"
+                tabindex="{tab.active?0:-1}"
+                title={tab.path}
+                href="/"
+                    >{lastElementOfFileName(tab.path)}&nbsp;<i 
+                    on:click={()=>closeTab(tab)} 
+                    on:keydown={(e) => {if (e.key == "Enter") closeTab(tab)}}
+                    role="button"
+                    tabindex="{tab.active?0:-1}"
+                    class="fa-solid fa-xmark"
+                    ></i><i class="fa-solid fa-circle"></i></a>
             </li>
         {/each}
     </ul>

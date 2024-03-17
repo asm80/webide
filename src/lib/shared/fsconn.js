@@ -57,20 +57,24 @@ export class StoreFS {
         if (typeof this.#files[name] == "undefined") throw new Error("File not found")
         delete this.#files[name]
         delete this.#times[name]
+        this._writeback()
     }
 
     async rename(name, newName) {
+        console.log("Rename",name,newName)
         if (typeof this.#files[name] == "undefined") throw new Error("File not found")
         this.#files[newName] = this.#files[name]
         this.#times[newName] = this.#times[name]
         delete this.#files[name]
         delete this.#times[name]
+        this._writeback()
     }
 
     async copyFile(name, newName) {
         if (typeof this.#files[name] == "undefined") throw new Error("File not found")
         this.#files[newName] = this.#files[name]
         this.#times[newName] = this.#times[name]
+        this._writeback()
     }
 
     async readdir(name) {

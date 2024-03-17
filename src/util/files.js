@@ -17,4 +17,15 @@ export const removeFirstDir = (path) => {
     return parts.join("/")
 }
 
+export const extractDir = (path) => {
+    let parts = path.split("/")
+    parts.pop()
+    return parts.join("/")
+}
+
+export const extractFilename = (path) => {
+    let parts = path.split("/")
+    return parts[parts.length-1]
+}
+
 export const fixForSave = (path) => removeFirstDir(removeLeadingSlash(path))
