@@ -7,6 +7,8 @@
     export let level=0;
     export let path="/"
 
+    import { setExpanded } from "../shared/buildTree.js"
+
     import ContextMenu from "./contextMenu.svelte";
 
     let showMenu = false;
@@ -68,9 +70,12 @@
     const updown = (item, force=false) => {
         //console.log(item)
         item.expanded = !item.expanded
+        setExpanded(path+item.text+"/", item.expanded)
         //item=item
         data=data
     }
+
+    console.log("SBTree", data)
 </script>
 
 <style>

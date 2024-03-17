@@ -1,14 +1,27 @@
 <script>
 
 	export let data;
+	import {buildTree} from '$lib/shared/buildTree.js'
+	import { localfs } from '$lib/shared/stores/localfs.js'
+
+	import { treeData as defaultTreeData } from '../test-tree';
+	let treeData = defaultTreeData
+	
 
 	let tabsOpened = [
-        {fn: "index.html", data: "<h1>Hello World</h1>", dirty:true},
-        {fn: "index.js", data: "console.log('Hello World')", active:true},
-        {fn: "index.css", dangling: true, data: "h1 {color: red}"}
+        {fn: "index.html", path:"/My Project/index.html", data: "<h1>Hello World</h1>", dirty:true},
+        {fn: "index.js", path:"/My Project/index.js", data: "console.log('Hello World')", active:true},
+        {fn: "index.css", path:"/My Project/index.css", dangling: true, data: "h1 {color: red}"}
     ]
 
-	console.log(data.fs)
+	const rebuildTree = async() => {
+		let res = await data.fs.readdir("")
+		console.log("RES", res)
+		treeData = await buildTree(res,data.fs)
+	}
+	localfs.subscribe(rebuildTree)
+	rebuildTree()
+
 	//data.fs.writeFile("project.toml", "test=0")
 	//data.lsconn.setItem("test","testic")
 
@@ -115,7 +128,7 @@
 	import SBTree from '$lib/sbtree/sbtree.svelte';
 	import Footer from '$lib/footer.svelte';
 
-	import { treeData } from '../test-tree';
+	//import { treeData } from '../test-tree';
 
 	import { onMount } from 'svelte';
 
@@ -184,7 +197,7 @@
 	<div class="column is-8 ais-fullheight is-main-content p-0">
 		<Editor {ideSize} {tabsOpened} fs={data.fs}/>
 	</div>
-	<div class="column is-1 ">
+	<div class="column is-2 ">
 
 {#if $page.data.session}
 	{#if $page.data.session.user?.image}

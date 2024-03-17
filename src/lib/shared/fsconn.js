@@ -1,13 +1,16 @@
 import { localfs } from '$lib/shared/stores/localfs.js';
+import { get } from 'svelte/store';
 
 export class StoreFS {
     #store;
     #files;
     #times;
     constructor() {
-        this.#files = {}
-        this.#times = {}
         this.#store = localfs
+        let big = JSON.parse(get(localfs))
+        console.log("LocalFS init",big  )
+        this.#files = big.files
+        this.#times = big.times
 
         //read all files from store, if...
         this.#store.subscribe(value => {
@@ -15,7 +18,7 @@ export class StoreFS {
             console.log("LocalFS new value",value)
             try {
                 let big = JSON.parse(value)
-                console.log(big)
+                //console.log(big)
                 if (!big) return
                 this.#files = big.files
                 this.#times = big.times
@@ -71,6 +74,7 @@ export class StoreFS {
     }
 
     async readdir(name) {
+        //console.log("RXD",this.#files, Object.keys(this.#files))
         return Object.keys(this.#files)
     }
 

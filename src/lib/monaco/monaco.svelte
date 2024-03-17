@@ -87,6 +87,11 @@ function loadCode(code, language) {
 			 saveFile(editor.getModel().getValue());
 		});
 
+		//Capture Ctrl+Shift+S to dispatch save as event
+		editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyS, () => {
+			 dispatch("saveFileAs", editor.getModel().getValue());
+		});
+
 		// on change
 		editor.getModel().onDidChangeContent((event) => {
 			if (doNotCheckOnChange) return

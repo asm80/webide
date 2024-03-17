@@ -2,6 +2,7 @@
 
     import { createEventDispatcher } from "svelte";
     import { slide } from "svelte/transition";
+    import { setExpanded } from "../shared/buildTree.js";
     export let data;
     export let level=0;
     export let path="/"
@@ -54,6 +55,8 @@
             return
         }
         item.expanded = !item.expanded
+
+        setExpanded(path+item.text+"/", item.expanded)
         //item=item
         data=data
     }
