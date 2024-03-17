@@ -23,12 +23,18 @@
 	import { onMount } from 'svelte';
 	import {recountOrders} from "$util/tabs.js"
 
+	import { get } from 'svelte/store';
+
 	import * as TOML from '@ltd/j-toml';
-	
+
+	//let tabsOpened = [{fn:"test.asm", data:"ld a, 0", active:true, justOpened:true, path:"test.asm", order:1}, {fn:"test2.asm", data:"ld a, 0", active:false, justOpened:false, path:"test2.asm", order:2}]	
 
 	let tabsOpened = []
 
-	
+	import CompilerWorker from '../workers/compiler.js?worker'
+//	import {compile} from '$util/compiler.js'
+	let compilerWorker
+
 	let cursor=""; //path of edited file
 
 	//lazy rebuild
@@ -45,16 +51,26 @@
 	rebuildTree()
 
 	let project = {
-		name:"My Project"
+		name:"My Project",
+		ide: {
+			size:"medium"
+		}
 	}
 
 	//find _project.toml and parse it
 	//if not found, create it
 
 	const projectInit = async () => {
-		let projectToml = TOML.parse(await data.fs.readFile("_project.toml"))
+		try {
+			let projectToml = TOML.parse(await data.fs.readFile("_project.toml"))
 		//console.log("Project toml", projectToml)
-		project = projectToml
+			project = projectToml
+			ideSize = project.ide.size?project.ide.size:"small"
+		} catch (e) {
+			//console.log("Project toml not found, creating", TOML.stringify(project, {newline: "\n"}))
+			await data.fs.writeFile("_project.toml", TOML.stringify(project, {newline: "\n"}))
+		}
+		
 	}
 
 	
@@ -162,8 +178,31 @@
 		tabsOpened = tabsOpened
 	}
 
+	const workerMessageProcessing = async (msg) => {
+		console.log("Worker message", msg)
+		if (msg.msg == "compiled") {
+			let file = msg.file
+			let hex = msg.data.hex
+			let lst = msg.data.lst
+			let path = extractDir(file)
+			let fn = extractFilename(file)
+			let dstPath = path
+			console.log("Compiled", path,fn)
+			if (path.includes("src")) {
+				dstPath = path.replace("src", "hex/")
+				//console.log("DST", dstPath)
+				await data.fs.writeFile(dstPath+fn+".hex", hex)
+				dstPath = path.replace("src", "lst/")
+				await data.fs.writeFile(dstPath+fn+".lst", lst)
+			} else {
+				await data.fs.writeFile(path+fn+".hex", hex)
+				await data.fs.writeFile(path+fn+".lst", lst)
+			}
+		}
+	}
 
-	onMount(() => {
+
+	onMount(async () => {
 		//console.log("Mounted")
 		recountOrder()
 		const container = document.getElementById("fileTabs");
@@ -180,17 +219,41 @@
       			e.preventDefault();
     		}
   		});
+
+		//worker
+		//compilerWorker = new CompilerWorker()
+		const CompilerWorker = (await import('../workers/compiler.js?worker')).default;
+		compilerWorker = new CompilerWorker()
+		compilerWorker.onmessage = (e) => {
+			workerMessageProcessing(e.data)
+		}
+
 // That will work perfectly
 	})
 
 	const buttonTest = async () => {
 		console.log("Button test")
+		/*
 		console.log($page.data.session)
 		let sess = $page.data.session
 		let user = sess.user
 		const res = await fetch(`/api/${user.userName}/MyProject/file/1/hejhola/vola.asm80`);
 		const item = await res.text();
 		console.log(item)
+		*/
+
+		let fs = get(localfs)
+		compilerWorker.postMessage( {msg:"compile",file:"test.a80", fs:fs})
+		console.log("Posted")
+		//let asm = await compile("test.a80", fs)
+		//console.log(s)
+	}
+
+	const doCompile = async () => {
+		let activeTab = tabsOpened.filter(t => t.active)[0]
+		if (!activeTab) return
+		console.log("DOCO",activeTab.path)
+		compilerWorker.postMessage( {msg:"compile",file:fixForSave(activeTab.path), fs:get(localfs)})
 	}
 
 	const closeTab = (event) => {
@@ -335,8 +398,10 @@
 			<option>medium</option>
 			<option>big</option>
 		</select>
-
+		<br>
 		<button class="button" on:click={buttonTest}>AnyButton</button>
+		<br>
+		<button class="button" on:click={doCompile}>Compile</button>
 	</div>
 
 </div>

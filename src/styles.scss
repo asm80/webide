@@ -81,7 +81,9 @@ body.dark button {
     color: $dark;
 }
 
-
+body>div.container {
+  width:99% !important
+}
 
 .is-sidebar-menu {
     padding: 0;

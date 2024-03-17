@@ -13,6 +13,7 @@
 		"format": "prettier --write --plugin prettier-plugin-svelte ."
 	},
 	"devDependencies": {
+		"@asm80/core": "github:asm80/asm80-core",
 		"@asm80/filesystem": "^1.0.5",
 		"@auth/core": "^0.28.0",
 		"@auth/sveltekit": "^0.14.0",

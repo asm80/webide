@@ -8,9 +8,10 @@ export class StoreFS {
     constructor() {
         this.#store = localfs
         let big = JSON.parse(get(localfs))
+        if (!big) big = {files:{},times:{}} //empty
         console.log("LocalFS init",big  )
-        this.#files = big.files
-        this.#times = big.times
+        this.#files = big.files?big.files:{}
+        this.#times = big.times?big.times:{}
 
         //read all files from store, if...
         this.#store.subscribe(value => {

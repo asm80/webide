@@ -38,7 +38,7 @@ editor.layout(lay)
 const resizer = () => {
 	
 console.log("Onresize")
-seth(window.innerHeight - 110)
+seth(window.innerHeight - 120)
 
 }
 
@@ -111,7 +111,7 @@ function loadCode(code, language) {
 //*****----*/
 
 const changeEditorText = (editorText) => {
-    //console.log("Changing editor text", editorText)
+    console.log("Changing editor text", editorText)
     //editorText = editorText
 	doNotCheckOnChange = true
     editor?.getModel().setValue(editorText);
