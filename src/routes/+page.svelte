@@ -7,9 +7,7 @@
 
 	import { treeData as defaultTreeData } from '../test-tree';
 	import {fixForSave, extractDir, extractFilename, replaceFilename, replaceExtension} from "$util/files.js"
-	let treeData = defaultTreeData
 
-	let ideSize="small"
 
 	import { SignIn, SignOut } from "@auth/sveltekit/components"
 	import { page } from "$app/stores"
@@ -31,13 +29,10 @@
 
 	import compilerWorker from "$util/workerPromise.js"
 
-	//let tabsOpened = [{fn:"test.asm", data:"ld a, 0", active:true, justOpened:true, path:"test.asm", order:1}, {fn:"test2.asm", data:"ld a, 0", active:false, justOpened:false, path:"test2.asm", order:2}]	
+	let treeData = defaultTreeData
 
+	let ideSize="small"
 	let tabsOpened = []
-
-//	import CompilerWorker from '../workers/compiler.js?worker'
-//	import {compile} from '$util/compiler.js'
-//	let compilerWorker
 
 	let cursor=""; //path of edited file
 
@@ -46,9 +41,9 @@
 
 	const rebuildTree = async(forced=false) => {
 		let res = await data.fs.readdir("")
-		console.log("RES", res)
+//		console.log("RES", res)
 		if (res.length == lastFilenum && !forced) return
-		console.log("Rebuild tree")
+//		console.log("Rebuild tree")
 		lastFilenum = res.length
 		treeData = await buildTree(res, data.fs, project)
 	}
@@ -73,54 +68,21 @@
 		} catch (e) {
 			//console.log("Project toml not found, creating", TOML.stringify(project, {newline: "\n"}))
 			await data.fs.writeFile("_project.toml", TOML.stringify(project, {newline: "\n"}))
-		}
-		
+		}	
 	}
 
 	
 	projectInit()
 
-		localfs.subscribe(rebuildTree)
+	localfs.subscribe(rebuildTree)
 	
-	//data.fs.writeFile("project.toml", "test=0")
-	//data.lsconn.setItem("test","testic")
+	// TODO: There should be a mechanism to prevent multiple rebuilds
+	// of the tree. It is not a problem now, but it will be
 
-	//find max order number, or 0 if no order given
-	const findMaxOrder = () => {
-		let max = 0
-		for (let t of tabsOpened) {
-			if (t.order > max) {
-				max = t.order
-			}
-		}
-		return max
-	}
+	// TODO: There should be a mechanism to subscribe changes of individual files, i.e. "file is opened in a tab"
+	// it should watch file and update the tab if the file is changed
+	// something like: fileChangeSub(file, callback) and fileChangeUnsub(file)
 
-	const recountOrder = () => {
-		let maxOrder = findMaxOrder()
-		//from left to right, skip tabs with order given
-		//assign maxOrder+1 to the rest, raise maxOrder
-		for (let t of tabsOpened) {
-			if (typeof t.order == "undefined") {
-				maxOrder++
-				t.order = maxOrder
-			}
-		}
-		//all tabs has its own order
-		//todo: normalize?
-
-		tabsOpened = tabsOpened
-	}
-
-	//todo: distinct click and dblclick
-
-
-
-	const openFile = async (e) => {
-		let res = await ui.openFile(e, tabsOpened, cursor, data)
-		tabsOpened = res.tabsOpened
-		cursor = res.cursor
-	}
 
 	onMount(async () => {
 		//console.log("Mounted")
@@ -142,7 +104,6 @@
 
 		compilerWorker.workerInit('../workers/compiler.js?worker');
 
-// That will work perfectly
 	})
 
 
@@ -192,7 +153,7 @@
 		}
 	}
 
-	// proxy functions for event handling
+	// proxy functions for event handling. It passes essential data to UI module
 
 	const closeTab = (event) => {
 		tabsOpened=ui.closeTab(event,tabsOpened)
@@ -206,7 +167,11 @@
 		ui.ctxAction(event, tabsOpened, data, rebuildTree)
 	}
 
-
+	const openFile = async (e) => {
+		let res = await ui.openFile(e, tabsOpened, cursor, data)
+		tabsOpened = res.tabsOpened
+		cursor = res.cursor
+	}
 </script>
 
 <style>
