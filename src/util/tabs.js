@@ -1,4 +1,4 @@
-    const findMaxOrder = (tabsOpened) => {
+    export const findMaxOrder = (tabsOpened) => {
         let max = 0
         for (let t of tabsOpened) {
             if (t.order > max) {

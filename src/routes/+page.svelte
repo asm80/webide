@@ -27,13 +27,17 @@
 
 	import * as TOML from '@ltd/j-toml';
 
+	import ui from "$lib/ui/ui.js"
+
+	import compilerWorker from "$util/workerPromise.js"
+
 	//let tabsOpened = [{fn:"test.asm", data:"ld a, 0", active:true, justOpened:true, path:"test.asm", order:1}, {fn:"test2.asm", data:"ld a, 0", active:false, justOpened:false, path:"test2.asm", order:2}]	
 
 	let tabsOpened = []
 
-	import CompilerWorker from '../workers/compiler.js?worker'
+//	import CompilerWorker from '../workers/compiler.js?worker'
 //	import {compile} from '$util/compiler.js'
-	let compilerWorker
+//	let compilerWorker
 
 	let cursor=""; //path of edited file
 
@@ -110,108 +114,17 @@
 
 	//todo: distinct click and dblclick
 
-	const deactivateAllTabs = () => {
-		tabsOpened = tabsOpened.map(t => {t.active = false; return t})
-	}
+
 
 	const openFile = async (e) => {
-		console.log("Open file", e.detail)
-		let item = e.detail.item
-		let force = e.detail.force
-		let path = e.detail.path
-		deactivateAllTabs()
-
-		let newData = "";
-		try {
-			console.log("Reading file", item, fixForSave(item.path))
-			newData = await data.fs.readFile(fixForSave(item.path))
-		} catch (e) {
-			;
-		}
-		//console.log("newData", newData)
-		console.log("before", tabsOpened)
-
-		let newOrder = findMaxOrder() + 1
-
-		//if there is a tab with this file (by path), just active it!
-		let found = tabsOpened.filter(t => t.path == path)
-		if (found.length > 0) {
-			console.log("Found Just Switch Tabs", found)
-			deactivateAllTabs()
-			found[0].active = true
-			found[0].justOpened = true
-			tabsOpened = tabsOpened
-			cursor = found[0].path
-			return
-		}
-
-
-		//if there is a dangling tab and not forced, replace it, else push new tab
-		if (tabsOpened.filter(t => t.dangling).length > 0 && !force) {
-			deactivateAllTabs()
-			tabsOpened = tabsOpened.map(t => {
-				if (t.dangling) {
-					t.fn = item.text
-					t.data = newData
-					t.active = true
-					t.justOpened = true;
-					t.path = path
-					cursor = path
-					
-				}
-				return t
-			})
-		} else 
-		{
-			deactivateAllTabs()
-			tabsOpened.push({
-				fn: item.text, 
-				data: newData, 
-				active:true, 
-				justOpened:true, 
-				path: path,
-				order: newOrder,
-				dangling: true
-			})
-			cursor = path
-		}
-		tabsOpened = tabsOpened
+		let res = await ui.openFile(e, tabsOpened, cursor, data)
+		tabsOpened = res.tabsOpened
+		cursor = res.cursor
 	}
-
-	const workerMessageProcessing = async (msg) => {
-		console.log("Worker message", msg)
-		if (msg.msg == "compiled") {
-			let error = msg.error
-			if (error) {
-				dialogs.alert(`Compilation error:<br>${error.msg}<br>Line Number: ${error.s.numline}<br>Line: <i>${error.s.line}</i>`)
-				//console.error("Compilation error", error)
-				return
-			}
-			let file = msg.file
-			let hex = msg.data.hex
-			let lst = msg.data.lst
-			let path = extractDir(file)
-			let fn = extractFilename(file)
-			let dstPath = path
-			console.log("Compiled", path,fn)
-			if (path.includes("src")) {
-				dstPath = path.replace("src", "hex/")
-				//console.log("DST", dstPath)
-				await data.fs.writeFile(dstPath+replaceExtension(fn,"hex"), hex)
-				dstPath = path.replace("src", "lst/")
-				await data.fs.writeFile(dstPath+replaceExtension(fn,"lst"), lst)
-			} else {
-				await data.fs.writeFile(path+replaceExtension(fn,"hex"), hex)
-				await data.fs.writeFile(path+replaceExtension(fn,"lst"), lst)
-			}
-			dialogs.alert("Compilation successful")
-		}
-	}
-
 
 	onMount(async () => {
 		//console.log("Mounted")
-		recountOrder()
+		recountOrders(tabsOpened)
 		const container = document.getElementById("fileTabs");
 		// where "container" is the id of the container
   		container.addEventListener("wheel", function (e) {
@@ -227,27 +140,17 @@
     		}
   		});
 
-		//worker
-		//compilerWorker = new CompilerWorker()
-		const CompilerWorker = (await import('../workers/compiler.js?worker')).default;
-		compilerWorker = new CompilerWorker()
-		compilerWorker.onmessage = (e) => {
-			workerMessageProcessing(e.data)
-		}
+		compilerWorker.workerInit('../workers/compiler.js?worker');
 
 // That will work perfectly
 	})
 
-	const buttonTest = async () => {
+
+	const ibuttonTest = async () => {
 		console.log("Button test")
-		/*
-		console.log($page.data.session)
-		let sess = $page.data.session
-		let user = sess.user
-		const res = await fetch(`/api/${user.userName}/MyProject/file/1/hejhola/vola.asm80`);
-		const item = await res.text();
-		console.log(item)
-		*/
+		ui.buttonTest(tabsOpened)
+		return
+
 
 		let fs = get(localfs)
 		compilerWorker.postMessage( {msg:"compile",file:"test.a80", fs:fs})
@@ -260,85 +163,49 @@
 		let activeTab = tabsOpened.filter(t => t.active)[0]
 		if (!activeTab) return
 		console.log("DOCO",activeTab.path)
-		compilerWorker.postMessage( {msg:"compile",file:fixForSave(activeTab.path), fs:get(localfs)})
+		try {
+			let msg = await compilerWorker.postMessage( {msg:"compile",file:fixForSave(activeTab.path), fs:get(localfs)})
+			if (msg.msg == "compiled") {
+				let file = msg.file
+				let hex = msg.data.hex
+				let lst = msg.data.lst
+				let path = extractDir(file)
+				let fn = extractFilename(file)
+				let dstPath = path
+				console.log("Compiled", path,fn)
+				if (path.includes("src")) {
+					dstPath = path.replace("src", "hex/")
+					//console.log("DST", dstPath)
+					await data.fs.writeFile(dstPath+replaceExtension(fn,"hex"), hex)
+					dstPath = path.replace("src", "lst/")
+					await data.fs.writeFile(dstPath+replaceExtension(fn,"lst"), lst)
+				} else {
+					await data.fs.writeFile(path+replaceExtension(fn,"hex"), hex)
+					await data.fs.writeFile(path+replaceExtension(fn,"lst"), lst)
+				}
+				dialogs.alert("Compilation successful")
+			}
+		} catch (e) {
+			dialogs.alert(`Compilation error:<br>${e.msg}<br>Line Number: ${e.s.numline}<br>Line: <i>${e.s.line}</i>`)
+			//console.error("Compilation error", error)
+			return
+		}
 	}
 
+	// proxy functions for event handling
+
 	const closeTab = (event) => {
-		let tab = event.detail
-		tabsOpened = tabsOpened.filter(t => t.path != tab.path); 
-		console.log("Close tab", tab, tabsOpened)
-		recountOrders(tabsOpened)
-		//activate tab with highest order
-		let max = findMaxOrder()
-		let newActive = tabsOpened.filter(t => t.order == max)[0]
-		if (newActive) {
-			newActive.active = true
-			//editorText = tab.data;
-		}
-		tabsOpened = tabsOpened; //do reactivity things
+		tabsOpened=ui.closeTab(event,tabsOpened)
 	}
 
 	const selectTab = (event) => {
-		console.log("Select Tab Top Level", event.detail)
 		cursor = event.detail.path
 	}
 
-	const ctxAction = async (event) => {
-		let {action, path, itemType} = event.detail
-		let dir;
-		let name;
-		switch (action) {
-			case "deleteitem":
-				
-				let result = await dialogs.confirm("Are you sure you want to delete '"+fixForSave(path)+"'?", "Delete file")
-				if (!result) return
-				console.log("Delete item", path, result)
-				if (itemType == "file") {
-					await data.fs.unlink(fixForSave(path))
-				} else {
-					let filelist = await data.fs.readdir(fixForSave(path))
-					console.log("To Delete", filelist)
-					for (let fn of filelist) {
-						await data.fs.unlink(fixForSave(path+"/"+fn))
-					}
-					
-				}
-				//remove path from tabs, if there is
-				tabsOpened = tabsOpened.filter(t => t.path != path)
-				rebuildTree()
-				break;
-			case "additem":
-				dir = path;
-				if (itemType == "file") {
-					dir = extractDir(path)
-				}
-				name = await dialogs.prompt("File name", {title:"Create file in "+(dir), submitButtonText:"Create", resetButton:false})
-				if (!name) return
-				console.log("Add item", name)
-				await data.fs.writeFile(fixForSave(dir+"/"+name), "")
-				rebuildTree()
-				break;
-			case "addfolder":
-				dir = path;
-				if (itemType == "file") {
-					dir = extractDir(path)
-				}
-				name = await dialogs.prompt("File name", {title:"Create folder in "+(dir), submitButtonText:"Create", resetButton:false})
-				if (!name) return
-				await data.fs.writeFile(fixForSave(dir+"/"+name+"/..empty"), "")
-				rebuildTree()
-				break;
-			case "rename":
-
-				name = await dialogs.prompt("New name", {title:"Rename "+extractFilename(path), submitButtonText:"Rename", resetButton:false})
-				if (!name) return
-				let newPath = replaceFilename(path, name)
-				console.log("rename item", path, newPath)
-				await data.fs.rename(fixForSave(path), fixForSave(newPath))
-				rebuildTree(true)
-				break;
-		}
+	const ctxAction = (event) => {
+		ui.ctxAction(event, tabsOpened, data, rebuildTree)
 	}
+
 
 </script>
 
@@ -406,7 +273,7 @@
 			<option>big</option>
 		</select>
 		<br>
-		<button class="button" on:click={buttonTest}>AnyButton</button>
+		<button class="button" on:click={ibuttonTest}>AnyButton</button>
 		<br>
 		<button class="button" on:click={doCompile}>Compile</button>
 	</div>

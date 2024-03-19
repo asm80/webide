@@ -28,7 +28,7 @@ const compile = async (name, fs) => {
 }
 
 addEventListener('message', async (e) => {
-    let {msg,file, fs} = e.data
+    let {msg,file, fs, workerId} = e.data
     let files = JSON.parse(fs).files
 
     let fakeFS = {
@@ -41,9 +41,9 @@ addEventListener('message', async (e) => {
     if (msg == "compile") {
         try {
             let res = await compile(file,fakeFS)
-            postMessage({msg:"compiled",error:false,data:res, file})
+            postMessage({msg:"compiled",error:false,data:res, file,workerId})
         } catch (e) {
-            postMessage({msg:"compiled",error:e.error, file})
+            postMessage({msg:"compiled",error:e.error, file, workerId})
         }
     }
 })
