@@ -4,6 +4,12 @@ export const replaceFilename = (path, newFilename) => {
     return parts.join("/")
 }
 
+export const replaceExtension = (path, newExtension) => {
+    let parts = path.split(".")
+    parts.pop()
+    return parts.join(".") + "." + newExtension
+}
+
 export const removeLeadingSlash = (path) => {
     if (path.startsWith("/")) {
         return path.substr(1)

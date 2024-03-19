@@ -1,7 +1,7 @@
 <nav class="navbar has-background-dark has-text-light" aria-label="main navigation">
     <div class="navbar-brand">
-      <a class="navbar-item" href="https://bulma.io">
-        <img src="/asm80-2-logo.svg" width="50" height="18" alt="">
+      <a class="navbar-item" href="/">
+        <img src="/asm80-2-logo.svg" width="70px" alt="">
       </a>
   
       <a role="button" href="/" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
@@ -13,14 +13,77 @@
   
     <div id="navbarBasicExample" class="navbar-menu">
       <div class="navbar-start">
-        <a class="navbar-item" href="/">
-          File
-        </a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="/">
+            File
+          </a>
+  
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="/">
+              New File
+            </a>
+            <a class="navbar-item" href="/">
+              Save
+            </a>
+            <a class="navbar-item" href="/">
+              Save As...
+            </a>
+            <hr class="navbar-divider">
+            <a class="navbar-item" href="/">
+              Open project
+            </a>
+            <a class="navbar-item" href="/">
+              Save project
+            </a>
+            <a class="navbar-item" href="/">
+              New project
+            </a>
+          </div>
+        </div>
 
-                <a class="navbar-item" href="/">
-                  Edit
-                </a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="/">
+            Edit
+          </a>
+  
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="/">
+              Beautify
+            </a>
+            <a class="navbar-item" href="/">
+              Jobs
+            </a>
+            <a class="navbar-item" href="/">
+              Contact
+            </a>
+            <hr class="navbar-divider">
+            <a class="navbar-item" href="/">
+              Report an issue
+            </a>
+          </div>
+        </div>
         
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="/">
+            Compile
+          </a>
+  
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="/">
+              Compile to HEX
+            </a>
+            <a class="navbar-item" href="/">
+              Compile to BIN
+            </a>
+            <a class="navbar-item" href="/">
+              Compile to OBJ
+            </a>
+            <hr class="navbar-divider">
+            <a class="navbar-item" href="/">
+              Report an issue
+            </a>
+          </div>
+        </div>
 
         <a class="navbar-item" href="/">
           Docs

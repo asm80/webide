@@ -6,7 +6,7 @@
 	import { dialogs } from "svelte-dialogs";
 
 	import { treeData as defaultTreeData } from '../test-tree';
-	import {fixForSave, extractDir, extractFilename, replaceFilename} from "$util/files.js"
+	import {fixForSave, extractDir, extractFilename, replaceFilename, replaceExtension} from "$util/files.js"
 	let treeData = defaultTreeData
 
 	let ideSize="small"
@@ -181,6 +181,12 @@
 	const workerMessageProcessing = async (msg) => {
 		console.log("Worker message", msg)
 		if (msg.msg == "compiled") {
+			let error = msg.error
+			if (error) {
+				dialogs.alert(`Compilation error:<br>${error.msg}<br>Line Number: ${error.s.numline}<br>Line: <i>${error.s.line}</i>`)
+				//console.error("Compilation error", error)
+				return
+			}
 			let file = msg.file
 			let hex = msg.data.hex
 			let lst = msg.data.lst
@@ -191,13 +197,14 @@
 			if (path.includes("src")) {
 				dstPath = path.replace("src", "hex/")
 				//console.log("DST", dstPath)
-				await data.fs.writeFile(dstPath+fn+".hex", hex)
+				await data.fs.writeFile(dstPath+replaceExtension(fn,"hex"), hex)
 				dstPath = path.replace("src", "lst/")
-				await data.fs.writeFile(dstPath+fn+".lst", lst)
+				await data.fs.writeFile(dstPath+replaceExtension(fn,"lst"), lst)
 			} else {
-				await data.fs.writeFile(path+fn+".hex", hex)
-				await data.fs.writeFile(path+fn+".lst", lst)
+				await data.fs.writeFile(path+replaceExtension(fn,"hex"), hex)
+				await data.fs.writeFile(path+replaceExtension(fn,"lst"), lst)
 			}
+			dialogs.alert("Compilation successful")
 		}
 	}
 

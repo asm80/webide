@@ -12,13 +12,17 @@ const compiler = async (name, fs) => {
 }
 
 export const compile = async (file, fs) => {
-    let fakeFS = {
-        readFile: async (name) => {
-            if (typeof files[name] == "undefined") throw new Error("File not found")
-            return files[name]
-        },
+    try {
+        let fakeFS = {
+            readFile: async (name) => {
+                if (typeof files[name] == "undefined") throw new Error("File not found")
+                return files[name]
+            },
+        }
+        
+        let res = await compiler(file,fakeFS)
+        return res
+    } catch (e) {   
+        throw e;
     }
-    
-    let res = await compiler(file,fakeFS)
-    return res
 }
