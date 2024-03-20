@@ -42,8 +42,33 @@ const deactivateAllTabs = (tabsOpened) => {
     tabsOpened = tabsOpened.map(t => {t.active = false; return t})
 }
 
+let couldBeDblClick = false
+
 const openFile = async (e, tabsOpened, cursor, data) => {
-    console.log("Open file", e.detail)
+    let isDoubleClick = false
+    
+    if (!couldBeDblClick) {
+        couldBeDblClick = true
+        setTimeout(() => {
+            couldBeDblClick = false
+        }, 300)
+    } else {
+        isDoubleClick = true
+        couldBeDblClick = false
+    }
+    
+    console.log("CLICK:Open file", e.detail, isDoubleClick?"dbl":"single")
+    if (isDoubleClick) {
+        //undngling
+        let active = tabsOpened.filter(t => t.active)[0]
+        if (active) {
+            if (active.dangling) {
+                active.dangling = false
+                return {tabsOpened, cursor}
+            }
+        }
+        return {tabsOpened, cursor}
+    }
     let item = e.detail.item
     let force = e.detail.force
     let path = e.detail.path
@@ -70,13 +95,14 @@ const openFile = async (e, tabsOpened, cursor, data) => {
         found[0].justOpened = true
         tabsOpened = tabsOpened
         cursor = found[0].path
-        return
+        return {tabsOpened, cursor}
     }
 
 
     //if there is a dangling tab and not forced, replace it, else push new tab
     if (tabsOpened.filter(t => t.dangling).length > 0 && !force) {
         deactivateAllTabs(tabsOpened)
+        console.log("Replace Dangling Tab")
         tabsOpened = tabsOpened.map(t => {
             if (t.dangling) {
                 t.fn = item.text
@@ -85,13 +111,14 @@ const openFile = async (e, tabsOpened, cursor, data) => {
                 t.justOpened = true;
                 t.path = path
                 cursor = path
-                
             }
             return t
         })
+        //return {tabsOpened, cursor}
     } else 
     {
         deactivateAllTabs(tabsOpened)
+        console.log("Push New Tab")
         tabsOpened.push({
             fn: item.text, 
             data: newData, 

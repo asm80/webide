@@ -29,6 +29,8 @@
 
 	import compilerWorker from "$util/workerPromise.js"
 
+	import { projectStore } from "$lib/shared/stores/project.js"
+
 	let treeData = defaultTreeData
 
 	let ideSize="small"
@@ -48,40 +50,51 @@
 		treeData = await buildTree(res, data.fs, project)
 	}
 	rebuildTree()
-
+/*
 	let project = {
 		name:"My Project",
 		ide: {
 			size:"medium"
 		}
 	}
-
+*/
 	//find _project.toml and parse it
 	//if not found, create it
+
+	let project = get(projectStore)
 
 	const projectInit = async () => {
 		try {
 			let projectToml = TOML.parse(await data.fs.readFile("_project.toml"))
 		//console.log("Project toml", projectToml)
-			project = projectToml
+			projectStore.set(projectToml)
 			ideSize = project.ide.size?project.ide.size:"small"
 		} catch (e) {
 			//console.log("Project toml not found, creating", TOML.stringify(project, {newline: "\n"}))
-			await data.fs.writeFile("_project.toml", TOML.stringify(project, {newline: "\n"}))
+			await data.fs.writeFile("_project.toml", TOML.stringify(get(projectStore), {newline: "\n"}))
 		}	
 	}
 
 	
 	projectInit()
 
+	$: data.fs.writeFile("_project.toml", TOML.stringify(project, {newline: "\n"}))
+	$: project.ide.size = ideSize
+
 	localfs.subscribe(rebuildTree)
 	
 	// TODO: There should be a mechanism to prevent multiple rebuilds
 	// of the tree. It is not a problem now, but it will be
+	// DONE: resolved by adding (key) parameter for tree leaves #each
 
 	// TODO: There should be a mechanism to subscribe changes of individual files, i.e. "file is opened in a tab"
 	// it should watch file and update the tab if the file is changed
 	// something like: fileChangeSub(file, callback) and fileChangeUnsub(file)
+	// needed behavior: when file is opened and something changes in the file system, the tab should be updated
+
+	// TODO: distinct between click and doubleclick on the tree leaf
+
+
 
 
 	onMount(async () => {
@@ -109,7 +122,8 @@
 
 	const ibuttonTest = async () => {
 		console.log("Button test")
-		ui.buttonTest(tabsOpened)
+		//ui.buttonTest(tabsOpened)
+		tabsOpened.filter(t => t.active)[0].data += "Button test"
 		return
 
 
@@ -169,6 +183,7 @@
 
 	const openFile = async (e) => {
 		let res = await ui.openFile(e, tabsOpened, cursor, data)
+		console.log("Open file", res)
 		tabsOpened = res.tabsOpened
 		cursor = res.cursor
 	}

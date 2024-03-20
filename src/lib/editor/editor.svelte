@@ -74,6 +74,8 @@
         if (!activeTab) {
             //select the tab with highest order
             let max = findMaxOrder()
+            console.log("Max order", max)
+            console.log(tabsOpened)
            activeTab = tabsOpened.filter(t => t.order == max)[0]
            activeTab.active = true
         }

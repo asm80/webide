@@ -89,7 +89,7 @@
 
     <div class="{level==0?"sb-tree-wrapper":""}">
 
-{#each data as item, index}
+{#each data as item (path+item.text+"/")}
     <div class="item {item.nodes?"folder":"file"} {level==0?"sb-tree-level0":""} {(item.path==cursor)?"cursor":""}" role="button" tabindex="0" 
         on:click={updown(item)} 
         on:dblclick={updown(item,true)}
