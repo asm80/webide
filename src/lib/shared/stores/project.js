@@ -4,7 +4,8 @@ let defaultProject = {
     name:"My Project",
     ide: {
         size:"medium"
-    }
+    },
+    needInit: true
 }
 export const projectStore = writable(defaultProject)
 

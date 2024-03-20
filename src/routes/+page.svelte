@@ -66,19 +66,40 @@
 	const projectInit = async () => {
 		try {
 			let projectToml = TOML.parse(await data.fs.readFile("_project.toml"))
-		//console.log("Project toml", projectToml)
+			console.log("Project toml", projectToml)
+			//delete project.needInit
+			project=projectToml
 			projectStore.set(projectToml)
 			ideSize = project.ide.size?project.ide.size:"small"
 		} catch (e) {
 			//console.log("Project toml not found, creating", TOML.stringify(project, {newline: "\n"}))
-			await data.fs.writeFile("_project.toml", TOML.stringify(get(projectStore), {newline: "\n"}))
+			//await data.fs.writeFile("_project.toml", TOML.stringify(get(projectStore), {newline: "\n"}))
+			//not needed now.
+			console.log("EEE",e)
+			delete project.needInit; //mke init project permanent
 		}	
 	}
 
 	
 	projectInit()
 
-	$: data.fs.writeFile("_project.toml", TOML.stringify(project, {newline: "\n"}))
+	const saveProjectTOML = async (project) => {
+		console.log("Save project toml", project)
+		if (project.needInit) return; //it overwrites the project.toml when store init, so there is a needInit flag.
+		console.log("Save project toml", project)
+		let toml = TOML.stringify(project, {newline: "\n"})
+		await data.fs.writeFile("_project.toml", toml)
+		// is _project.toml in opened tabs?
+		let found = tabsOpened.filter(t => t.path == `/${project.name}/_project.toml`)
+		console.log("Found", toml, found, tabsOpened)
+		if (found.length > 0) {
+			found[0].data = toml
+			found[0].justOpened = true
+			tabsOpened = tabsOpened
+		}
+	}
+
+	$: saveProjectTOML(project)
 	$: project.ide.size = ideSize
 
 	localfs.subscribe(rebuildTree)
@@ -124,6 +145,8 @@
 		console.log("Button test")
 		//ui.buttonTest(tabsOpened)
 		tabsOpened.filter(t => t.active)[0].data += "Button test"
+		tabsOpened.filter(t => t.active)[0].justOpened = true;
+		tabsOpened = tabsOpened
 		return
 
 
