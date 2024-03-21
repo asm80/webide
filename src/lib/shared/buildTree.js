@@ -73,19 +73,23 @@ export const buildTree = async (fileList, fs, project) => {
         },
         {
             disableCtx: true,
-            text: "Online"
+            text: "Online",
+            appLayout: "online"
         },
         {
             disableCtx: true,
-            text: "Terminal"
+            text: "Terminal",
+            appLayout: "terminal"
         },
         {
             disableCtx: true,
-            text: "Demos"
+            text: "Emulators",
+            appLayout: "emulatorSelector"
         },
         {
             disableCtx: true,
-            text: "Settings"
+            text: "Settings",
+            appLayout: "settings"
         }
     ];
 
