@@ -57,7 +57,7 @@ const openFile = async (e, tabsOpened, cursor, data) => {
         couldBeDblClick = false
     }
     
-    console.log("CLICK:Open file", e.detail, isDoubleClick?"dbl":"single")
+    //console.log("CLICK:Open file", e.detail, isDoubleClick?"dbl":"single")
     if (isDoubleClick) {
         //undngling
         let active = tabsOpened.filter(t => t.active)[0]

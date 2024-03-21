@@ -75,6 +75,13 @@
 
     const updown = (item, force=false) => {
         //console.log(item)
+
+        // clicked on tree item. Let try if appLayout is present. If so, then dispatch appLayout event
+        if (item.appLayout) {
+            dispatch("appLayout", {layout: item.appLayout})
+            return
+        }
+
         item.expanded = !item.expanded
         setExpanded(path+item.text+"/", item.expanded)
         //item=item

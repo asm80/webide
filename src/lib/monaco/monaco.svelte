@@ -7,11 +7,6 @@ import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
 import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
-import { code as jsCode } from '$lib/js_code';
-import { code as tsCode } from '$lib/ts_code';
-import { code as phpCode } from '$lib/php_code';
-import { code as pyCode } from '$lib/py_code';
-import { code as htmlCode } from '$lib/html_code';
 
 import { a80Monarch } from '../../util/lang/a80.js';
 

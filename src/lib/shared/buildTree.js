@@ -65,10 +65,11 @@ export const buildTree = async (fileList, fs, project) => {
             id: "project"
         },
         {
-            text: "Workspace",
+            text: "Project",
             icon: "fa-regular fa-folder",
             disableCtx: true,
-            title: "Open workspaces"
+            title: "Open project",
+            appLayout: "projectSelector"
         },
         {
             disableCtx: true,

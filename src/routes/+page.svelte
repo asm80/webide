@@ -36,6 +36,8 @@
 	let ideSize="small"
 	let tabsOpened = []
 
+	let appLayout = "main"; //main, projectSelector, ...
+
 	let cursor=""; //path of edited file
 
 	//lazy rebuild
@@ -112,10 +114,10 @@
 	// it should watch file and update the tab if the file is changed
 	// something like: fileChangeSub(file, callback) and fileChangeUnsub(file)
 	// needed behavior: when file is opened and something changes in the file system, the tab should be updated
+	// DONE: sync mechanism is implemented by justOpened flag.
 
 	// TODO: distinct between click and doubleclick on the tree leaf
-
-
+	// DONE: implemented by timeout function in ui.openFile
 
 
 	onMount(async () => {
@@ -210,6 +212,15 @@
 		tabsOpened = res.tabsOpened
 		cursor = res.cursor
 	}
+
+	const setAppLayout = (event) => {
+		console.log(event)
+		if (event.target) {
+			appLayout = event.target.dataset.layout
+		} else {
+			appLayout = event.detail.layout
+		}
+	}
 </script>
 
 <style>
@@ -237,14 +248,26 @@
 <Nav />
 
 <div class="columns is-fullheight">
+	{#if appLayout == "main"}
+	
 	<div class="column is-2 is-sidebar-menu scrollbar">
 		<aside class="amenu">
-			<SBTree data={treeData} cursor={cursor} project={project} on:openFile={openFile} on:ctxAction={ctxAction}/>
+			<SBTree data={treeData} cursor={cursor} project={project} on:openFile={openFile} on:ctxAction={ctxAction} on:appLayout={setAppLayout}/>
 		</aside>
 	</div>
 	<div class="column is-8 ais-fullheight is-main-content p-0">
 		<Editor {ideSize} {tabsOpened} on:closeTab={closeTab} on:selectTab={selectTab} fs={data.fs}/>
 	</div>
+
+	{/if}
+	{#if appLayout == "projectSelector"}
+	<div class="column is-10 is-main-content">
+		<h1 class="title">Project selector</h1>
+		<p>Project selector is not implemented yet</p>
+		<button class="button" on:click={setAppLayout} data-layout="main">Back to main</button>
+	</div>
+	{/if}
+
 	<div class="column is-2 ">
 
 {#if $page.data.session}
