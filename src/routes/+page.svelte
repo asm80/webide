@@ -308,8 +308,7 @@
 
 
 	<div class="column is-2 ">
-		{JSON.stringify($page.data)}
-
+		
 {#if $page.data.session}
 	{#if $page.data.session.user?.image}
 	  <img
