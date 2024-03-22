@@ -18,6 +18,9 @@
 	import SBTree from '$lib/sbtree/sbtree.svelte';
 	import Footer from '$lib/footer.svelte';
 
+	import ProjectSelector from '$lib/projectSelector/projectSelector.svelte';
+	import SwitchLayout from '../lib/switchLayout.svelte';
+
 	import { onMount } from 'svelte';
 	import {recountOrders} from "$util/tabs.js"
 
@@ -260,15 +263,52 @@
 	</div>
 
 	{/if}
+
+
 	{#if appLayout == "projectSelector"}
 	<div class="column is-10 is-main-content">
 		<h1 class="title">Project selector</h1>
-		<p>Project selector is not implemented yet</p>
-		<button class="button" on:click={setAppLayout} data-layout="main">Back to main</button>
+		<ProjectSelector session={$page.data.session?.user}/>
+		<SwitchLayout on:setAppLayout={setAppLayout} />
 	</div>
 	{/if}
 
+	{#if appLayout == "online"}
+	<div class="column is-10 is-main-content">
+		<h1 class="title">Online projects</h1>
+		<p>Project selector is not implemented yet</p>
+		<SwitchLayout on:setAppLayout={setAppLayout} />
+	</div>
+	{/if}
+
+	{#if appLayout == "terminal"}
+	<div class="column is-10 is-main-content">
+		<h1 class="title">Serial terminal</h1>
+		<p>Project selector is not implemented yet</p>
+		<SwitchLayout on:setAppLayout={setAppLayout} />
+	</div>
+	{/if}
+
+	{#if appLayout == "emulatorSelector"}
+	<div class="column is-10 is-main-content">
+		<h1 class="title">Emulators</h1>
+		<p>Project selector is not implemented yet</p>
+		<SwitchLayout on:setAppLayout={setAppLayout} />
+	</div>
+	{/if}
+
+
+	{#if appLayout == "settings"}
+	<div class="column is-10 is-main-content">
+		<h1 class="title">IDE settings</h1>
+		<p>Project selector is not implemented yet</p>
+		<SwitchLayout on:setAppLayout={setAppLayout} />
+	</div>
+	{/if}
+
+
 	<div class="column is-2 ">
+		{JSON.stringify($page.data)}
 
 {#if $page.data.session}
 	{#if $page.data.session.user?.image}

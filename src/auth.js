@@ -62,7 +62,7 @@ const config = {
               session.user.userName = userName;
             }
 
-            //console.log(user)
+            console.log("DOING SESSION",user)
 
             
 

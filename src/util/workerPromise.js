@@ -1,5 +1,5 @@
 //worker promise - we need store the promise, pair worker with it, pass promise ID back and then resolve it
-
+/* @vite-ignore */
 let promiseStore = {}
 
 const generateId = () => {
@@ -22,7 +22,7 @@ const workerMessageProcessing = (data) => {
 
 let compilerWorker = null
 const workerInit = async (workerFile) => {
-    const CompilerWorker = (await import(workerFile)).default;
+    const CompilerWorker = (await import('../workers/compiler.js?worker')).default;
     compilerWorker = new CompilerWorker()
     compilerWorker.onmessage = (e) => {
         workerMessageProcessing(e.data)
