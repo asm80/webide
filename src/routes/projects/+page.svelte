@@ -1,8 +1,10 @@
 <script>
 
+export let data;
 
 	import { page } from "$app/stores"
 
+	import { localfs } from '$lib/shared/stores/localfs.js'
 
 	import ProjectSelector from '$lib/projectSelector/projectSelector.svelte';
 	import SwitchLayout from '$lib/switchLayout.svelte';
@@ -21,6 +23,8 @@
 
 	onMount(async () => {
 		//console.log("Mounted")
+		let pt = await data.fs.readFile("_project.toml")
+		console.log("PT", pt)
 
 	})
 
