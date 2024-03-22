@@ -4,9 +4,9 @@
     const setAppLayout = (e) => {
         dispatch("setAppLayout", {layout:e.target.dataset.layout});
     }
-    export let newLayout = "main";
-    export let title = "Back to main"
+    export let newLayout = "editor";
+    export let title = "Back to editor"
 </script>
 <div class="py-5 my-5">
-<button class="button" on:click={setAppLayout} data-layout="{newLayout}">{title}</button>
+<a class="button" on:click={setAppLayout} href="/{newLayout}">{title}</a>
 </div>

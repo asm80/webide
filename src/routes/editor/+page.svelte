@@ -5,7 +5,6 @@
 	import { localfs } from '$lib/shared/stores/localfs.js'
 	import { dialogs } from "svelte-dialogs";
 
-	import { treeData as defaultTreeData } from '../test-tree';
 	import {fixForSave, extractDir, extractFilename, replaceFilename, replaceExtension} from "$util/files.js"
 
 
@@ -19,7 +18,7 @@
 	import Footer from '$lib/footer.svelte';
 
 	import ProjectSelector from '$lib/projectSelector/projectSelector.svelte';
-	import SwitchLayout from '../lib/switchLayout.svelte';
+	import SwitchLayout from '$lib/switchLayout.svelte';
 
 	import { onMount } from 'svelte';
 	import {recountOrders} from "$util/tabs.js"
@@ -34,7 +33,7 @@
 
 	import { projectStore } from "$lib/shared/stores/project.js"
 
-	let treeData = defaultTreeData
+	let treeData = []
 
 	let ideSize="small"
 	let tabsOpened = []

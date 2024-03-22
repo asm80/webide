@@ -225,6 +225,32 @@
 		}
 	}
 </script>
+
+<style>
+	.scrollbar::-webkit-scrollbar {
+  width: 13px;
+}
+.scrollbar::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius:0;
+}
+
+.tabs::-webkit-scrollbar {
+  height: 4px;
+}
+.tabs::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius:0;
+}
+
+
+
+</style>
+
+<div class="{ideSize}">
+<Nav />
+
+<div class="columns is-fullheight">
 	{#if appLayout == "main"}
 	
 	<div class="column is-2 is-sidebar-menu scrollbar">
@@ -280,3 +306,43 @@
 	</div>
 	{/if}
 
+
+	<div class="column is-2 ">
+		
+{#if $page.data.session}
+	{#if $page.data.session.user?.image}
+	  <img
+		src={$page.data.session.user.image}
+		class="avatar"
+		alt="User Avatar"
+	  />
+	{/if}
+	
+	<span class="signedInText">
+	  <small>Signed in as</small><br />
+	  <strong>{$page.data.session.user?.userName ?? "User"}</strong>
+	</span>
+	<SignOut>
+	  <div slot="submitButton" class="buttonPrimary">Sign out</div>
+	</SignOut>
+  {:else}
+	<span class="notSignedInText">You are not signed in</span>
+	<SignIn>
+	  <div slot="submitButton" class="buttonPrimary">Sign in</div>
+	</SignIn>
+  {/if}
+
+		<select class="select" bind:value={ideSize}>
+			<option>small</option>
+			<option>medium</option>
+			<option>big</option>
+		</select>
+		<br>
+		<button class="button" on:click={ibuttonTest}>AnyButton</button>
+		<br>
+		<button class="button" on:click={doCompile}>Compile</button>
+	</div>
+
+</div>
+<Footer />
+</div>

@@ -1,6 +1,7 @@
 <script>
 
     import { createEventDispatcher } from "svelte";
+    import { pushState, goto } from "$app/navigation"
     import SBLeaf from "./sbleaf.svelte";
     import { slide } from "svelte/transition";
     export let data;
@@ -79,6 +80,13 @@
         // clicked on tree item. Let try if appLayout is present. If so, then dispatch appLayout event
         if (item.appLayout) {
             dispatch("appLayout", {layout: item.appLayout})
+            return
+        }
+
+        if (item.href) {
+            //pushState(item.href);
+            //history.pushState({}, "", item.href)
+            goto(item.href)
             return
         }
 

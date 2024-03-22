@@ -69,27 +69,27 @@ export const buildTree = async (fileList, fs, project) => {
             icon: "fa-regular fa-folder",
             disableCtx: true,
             title: "Open project",
-            appLayout: "projectSelector"
+            href: "/projects"
         },
         {
             disableCtx: true,
             text: "Online",
-            appLayout: "online"
+            href: "/online"
         },
         {
             disableCtx: true,
             text: "Terminal",
-            appLayout: "terminal"
+            href: "/terminal"
         },
         {
             disableCtx: true,
             text: "Emulators",
-            appLayout: "emulatorSelector"
+            href: "/emulatorSelector"
         },
         {
             disableCtx: true,
             text: "Settings",
-            appLayout: "settings"
+            href: "/settings"
         }
     ];
 
