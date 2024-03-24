@@ -215,6 +215,19 @@
 		cursor = res.cursor
 	}
 
+	const move = async (e) => {
+		let from = e.detail.from
+		let toPath = e.detail.to
+		if (toPath.endsWith("/")) toPath = toPath.slice(0,-1)
+		let to = toPath +"/"+ from.split("/").pop()
+		console.log("Move", from, to)
+		let res = await data.fs.rename(fixForSave(from),fixForSave(to))
+		//console.log("Moving:",res)
+
+		//moved
+		rebuildTree(true)
+	}
+
 	const setAppLayout = (event) => {
 		console.log(event)
 		if (event.target) {
@@ -228,7 +241,15 @@
 	
 	<div class="column is-2 is-sidebar-menu scrollbar">
 		<aside class="amenu">
-			<SBTree data={treeData} cursor={cursor} project={project} on:openFile={openFile} on:ctxAction={ctxAction} on:appLayout={setAppLayout}/>
+			<SBTree 
+				data={treeData} 
+				cursor={cursor} 
+				project={project} 
+				on:openFile={openFile} 
+				on:ctxAction={ctxAction} 
+				on:appLayout={setAppLayout}
+				on:move={move}
+				/>
 		</aside>
 	</div>
 	<div class="column is-8 ais-fullheight is-main-content p-0">

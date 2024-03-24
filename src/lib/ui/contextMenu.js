@@ -5,6 +5,32 @@ import { get } from "svelte/store"
 
 import JSZip from "jszip"
 
+const NonbinaryFiles = [
+    "asm","a80","txt","a68","a09","z80","bas","c","cpp","h","hpp","inc","s",
+    "hex","srec","c65","lst","md"
+]
+
+const checkExt = (filename) => {
+    let ext = filename.split(".").pop().toLowerCase()
+    return NonbinaryFiles.includes(ext)
+}
+
+const isbinToBufer = (file) => {
+    //convert to binary
+    let uint8 = []
+    for (let i=0; i<file.length; i++) {
+        if (file.substr(i,1) == "\\") { //treat backslash
+            let s = file.substr(i+1,2)
+            uint8.push(parseInt(s,16))
+            i+=2
+        } else {
+            uint8.push(file.charCodeAt(i))
+        }
+    }
+    file = new Uint8Array(uint8)
+    return file
+}
+
 
 export const ctxAction = async (event, tabsOpened, data, rebuildTree) => {
     let {action, path, itemType} = event.detail
@@ -73,6 +99,10 @@ export const ctxAction = async (event, tabsOpened, data, rebuildTree) => {
                     if (fn.indexOf("..empty")>=0) continue
                     let addFile = fn.toString()
                     let file = await data.fs.readFile(addFile)
+                    if (fn.indexOf(".isbin")>=0) {
+                        file = isbinToBufer(file)
+                        fn = fn.replace(".isbin","")
+                    }
                     zip.file(fn, file)
                 }
                 let content = await zip.generateAsync({type:"blob"})
@@ -84,6 +114,10 @@ export const ctxAction = async (event, tabsOpened, data, rebuildTree) => {
                 break;
             } else {
                 let file = await data.fs.readFile(fixForSave(path))
+                if (path.indexOf(".isbin")>=0) {
+                    file = isbinToBufer(file)
+                    path = path.replace(".isbin","")
+                }
                 let blob = new Blob([file], {type: "application/octet-stream"})
                 let url = URL.createObjectURL(blob)
                 let a = document.createElement("a")
@@ -92,6 +126,44 @@ export const ctxAction = async (event, tabsOpened, data, rebuildTree) => {
                 a.click()
             }
             
+            break;
+        case "upload":
+            let files = event.detail.files
+            console.log("Upload", files)
+            for (let file of files) {
+                let reader = new FileReader()
+                let text = checkExt(file.name)
+                if (text) {
+                    reader.onload = async (e) => {
+                        let result = reader.result
+                        let name = file.name
+                        await data.fs.writeFile(fixForSave(path+"/"+name), result)
+                    }
+                    reader.readAsText(file)
+                } else {
+                    reader.onload = async (e) => {
+                        let result = reader.result
+
+                        let uint8 = new Uint8Array(result)
+                        // convert UINT8 to string. All chars < 128 convert to chars, others to \HH
+                        let fileData = ""
+                        for (let i=0; i<uint8.length; i++) {
+                            if ((uint8[i] < 128 && uint8[i] > 31) || uint8[i] == 10 || uint8[i] == 13 || uint8[i] == 9) {
+                                fileData += String.fromCharCode(uint8[i])
+                            } else {
+                                let s = uint8[i].toString(16)
+                                if (s.length < 2) s = "0"+s
+                                fileData += "\\"+s
+                            }
+                        }
+
+                        let name = file.name
+                        await data.fs.writeFile(fixForSave(path+"/"+name+".isbin"), fileData)
+                    }
+                    reader.readAsArrayBuffer(file)
+                }
+            }
+            rebuildTree()
             break;
     }
 }

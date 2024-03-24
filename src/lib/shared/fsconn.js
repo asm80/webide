@@ -16,7 +16,7 @@ export class StoreFS {
         //read all files from store, if...
         this.#store.subscribe(value => {
             if (!value) return
-            console.log("LocalFS new value",value)
+            //console.log("LocalFS new value",value)
             try {
                 let big = JSON.parse(value)
                 //console.log(big)

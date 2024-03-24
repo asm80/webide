@@ -13,6 +13,8 @@
 
     import ContextMenu from "./contextMenu.svelte";
 
+    import Dropzone from "svelte-file-dropzone";
+
     let showMenu = false;
     const dispatch = createEventDispatcher();
 
@@ -106,9 +108,29 @@
         dispatch("ctxAction", {action:"download", path: "/", itemType:"folder"})
     }
 
+    //universal event raiser
+    const raiseEvent = (e) => {
+        console.log("Raise event", e.type, e.detail)
+        dispatch(e.type, e.detail)
+    }
+
     const ctxAction = (e) => {
         //console.log("Ctx action", e.detail)
         dispatch("ctxAction", e.detail)
+    }
+
+    const handleFilesSelect = (e) => {
+        let files = {
+            accepted: [],
+            rejected: []
+        };
+        const { acceptedFiles, fileRejections } = e.detail;
+        files.accepted = [...files.accepted, ...acceptedFiles];
+        files.rejected = [...files.rejected, ...fileRejections];
+        //console.log("Files", files.accepted)
+        if (files.accepted.length>0) {
+            dispatch("ctxAction", {action:"upload", path: "/", itemType:"folder", files: files.accepted})
+        }
     }
 </script>
 
@@ -143,6 +165,8 @@
         background-color: #333;
         color: gold;
     }
+
+
 </style>
 
 
@@ -170,6 +194,9 @@
             <a class="p-0 m-0" style="width:1rem" title="Download as ZIP" href="/" on:click|preventDefault|stopPropagation={downloadZip}><i class="fa-solid fa-download"></i></a>
         </div>
         {/if}
+        {#if item.dropzone}
+            <Dropzone on:drop={handleFilesSelect} undisableDefaultStyles containerStyles="background:#333;color:#fff" />
+        {/if}
                 <!--<i class={item.icon}></i>&nbsp;-->
 
     </div>
@@ -181,7 +208,8 @@
                 path={path+item.text+"/"} 
                 cursor={cursor}
                 on:ctxm={showContextMenu} 
-                on:openFile={openFile}
+                on:openFile={raiseEvent}
+                on:move={raiseEvent}
             />
         </div>
     {/if}

@@ -48,6 +48,12 @@
         dispatch("openFile", e.detail);
     }
 
+    //universal event raiser
+    const raiseEvent = (e) => {
+        //console.log("Raise event", e.type, e.detail)
+        dispatch(e.type, e.detail)
+    }
+
     const updown = (item, force=false) => {
         //console.log(item)
         if (!item.nodes) {
@@ -61,6 +67,46 @@
         //item=item
         data=data
     }
+
+    let dropZone = null;
+    function handleDragStart(e) {
+        e.dataTransfer.dropEffect = "move";
+        e.dataTransfer
+         .setData("text", e.target.getAttribute('data-f'));
+    }
+
+    function handleDragEnd(e) {
+    }
+
+    function handleDragEnter(e) {
+
+        dropZone = e.target.getAttribute('data-p');
+        e.target.style.backgroundColor = '#446';
+        //console.log("Entering", dropZone)
+    }
+
+    function handleDragLeave(e) {
+        e.target.style.backgroundColor = 'rgb(20, 20, 20)';
+        if (dropZone == e.target.getAttribute('data-p')) {
+            //dropZone = null;  
+        }
+    }
+
+    function handleDragDrop(e) {
+        e.target.style.backgroundColor = 'rgb(20, 20, 20)';
+        var element_id = e
+            .dataTransfer
+            .getData("text");
+        //console.log("You droped " + element_id + " into "+dropZone)
+        if (!dropZone) {
+            return
+        }
+        //console.log("Dispatched",{from: element_id, to: dropZone})
+        dispatch("move", {from: element_id, to: dropZone})
+        dropZone=null
+        //console.log(status)
+    }
+
 </script>
 <style>
 
@@ -93,6 +139,15 @@
         on:dblclick={updown(item,true)}
         on:keydown={updown(item)}
         on:contextmenu|preventDefault={(e)=>ctxm(e,item, path+item.text)}
+        draggable=true
+        on:dragstart={handleDragStart}
+		on:dragend={handleDragEnd}
+
+        on:dragenter={handleDragEnter} 
+        on:dragleave={handleDragLeave}  
+        on:drop|preventDefault={handleDragDrop} 
+        data-p={item.nodes?(path+item.text):path.substring(0,path.length-1)}
+        data-f={path+item.text}
 
         title="{item.title?item.title:(path+item.text)}"
         >
@@ -112,7 +167,7 @@
     </div>
     {#if item.nodes && item.expanded}
         <div style="margin-left:{options.parentsMarginLeft}; border-left:1px dotted #444; padding-left:{options.parentsMarginLeft}" transition:slide>
-            <svelte:self cursor={cursor} data={item.nodes} level={level+1} path={path+item.text+"/"} on:ctxm={raiseCtxm} on:openFile={raiseOpenFile}/>
+            <svelte:self cursor={cursor} data={item.nodes} level={level+1} path={path+item.text+"/"} on:ctxm={raiseCtxm} on:openFile={raiseOpenFile} on:move={raiseEvent}/>
         </div>
     {/if}
 {/each}

@@ -228,11 +228,17 @@
 	{#if appLayout == "main"}
 	
 	<div class="column is-2 is-sidebar-menu scrollbar">
+		<h1>DO NOT USE THIS</h1>
+		<h2>USE /editor INSTEAD</h2>
+	
 		<aside class="amenu">
 			<SBTree data={treeData} cursor={cursor} project={project} on:openFile={openFile} on:ctxAction={ctxAction} on:appLayout={setAppLayout}/>
 		</aside>
 	</div>
 	<div class="column is-8 ais-fullheight is-main-content p-0">
+		<h1>DO NOT USE THIS</h1>
+		<h2>USE /editor INSTEAD</h2>
+	
 		<Editor {ideSize} {tabsOpened} on:closeTab={closeTab} on:selectTab={selectTab} fs={data.fs}/>
 	</div>
 

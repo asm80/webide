@@ -22,12 +22,12 @@ const buildOneLevel = async (filelist, path,fs) => {
         if (file.endsWith("/")) {
             let expanded = false
             let folder = path+file
-            console.log("Checking expanded",folder,expandedFolders[folder],expandedFolders)
+            //console.log("Checking expanded",folder,expandedFolders[folder],expandedFolders)
             if (expandedFolders[folder]) {
                 expanded = true
             }
             let subList = await fs.readdir(fixForSave(folder))
-            console.log("sublist",folder, subList)
+            //console.log("sublist",folder, subList)
             let subTree = await buildOneLevel(subList, folder,fs)
             tree.push({icon: "fa-regular fa-folder", text: file.substr(0,file.length-1), nodes: subTree, expanded: expanded})
         }
@@ -64,6 +64,13 @@ export const buildTree = async (fileList, fs, project) => {
             path:projectPath,
             id: "project"
         },
+        {   
+            expanded: false, 
+            disableCtx: true,
+            dropzone:true,
+            text:""
+        },
+
         {
             text: "Project",
             icon: "fa-regular fa-folder",
@@ -93,7 +100,7 @@ export const buildTree = async (fileList, fs, project) => {
         }
     ];
 
-    console.log(treeData)
+    //console.log(treeData)
 
     return treeData
 }
