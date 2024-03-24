@@ -71,14 +71,15 @@ export const ctxAction = async (event, tabsOpened, data, rebuildTree) => {
                 let zip = new JSZip()
                 for (let fn of filelist) {
                     if (fn.indexOf("..empty")>=0) continue
-                    let file = await data.fs.readFile(fixForSave(path+"/"+fn))
+                    let addFile = fn.toString()
+                    let file = await data.fs.readFile(addFile)
                     zip.file(fn, file)
                 }
                 let content = await zip.generateAsync({type:"blob"})
                 let url = URL.createObjectURL(content)
                 let a = document.createElement("a")
                 a.href = url
-                a.download = project.name+".zip"
+                a.download = (path=="/"?project.name:extractFilename(path))+".zip"
                 a.click()
                 break;
             } else {
