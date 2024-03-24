@@ -106,7 +106,7 @@ function loadCode(code, language) {
 //*****----*/
 
 const changeEditorText = (editorText) => {
-    console.log("Changing editor text", editorText)
+    //console.log("Changing editor text", editorText)
     //editorText = editorText
 	doNotCheckOnChange = true
     editor?.getModel().setValue(editorText);
