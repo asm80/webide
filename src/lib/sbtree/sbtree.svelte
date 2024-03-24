@@ -102,6 +102,9 @@
     const newFolder = (e) => {
         dispatch("ctxAction", {action:"addfolder", path: "/", itemType:"folder"})
     }
+    const downloadZip = (e) => {
+        dispatch("ctxAction", {action:"download", path: "/", itemType:"folder"})
+    }
 
     const ctxAction = (e) => {
         //console.log("Ctx action", e.detail)
@@ -133,6 +136,13 @@
     .sb-tree-wrapper:hover .hovermenu {
         visibility: visible;
     }
+    .hovermenu a {
+        color:#fff
+    }
+    .hovermenu a:hover {
+        background-color: #333;
+        color: gold;
+    }
 </style>
 
 
@@ -155,9 +165,9 @@
         {item.text}
         {#if item.hoverMenu}
         <div class="is-pulled-right has-text-right hovermenu">
-            <i class="fa-solid fa-file-circle-plus" title="New File" on:click|preventDefault|stopPropagation={newFile}></i>&nbsp;
-            <i class="fa-solid fa-folder-plus"  title="New Folder"  on:click|preventDefault|stopPropagation={newFolder}></i>&nbsp;
-            <i class="fa-solid fa-minimize" title="Collapse all"></i>
+            <a class="p-0 m-0" style="width:1rem" title="New File" on:click|preventDefault|stopPropagation={newFile} href="/"><i class="fa-solid fa-file-circle-plus"></i></a>
+            <a class="p-0 m-0" style="width:1rem" title="New Folder" on:click|preventDefault|stopPropagation={newFolder} href="/"><i class="fa-solid fa-folder-plus"></i></a>
+            <a class="p-0 m-0" style="width:1rem" title="Download as ZIP" href="/" on:click|preventDefault|stopPropagation={downloadZip}><i class="fa-solid fa-download"></i></a>
         </div>
         {/if}
                 <!--<i class={item.icon}></i>&nbsp;-->

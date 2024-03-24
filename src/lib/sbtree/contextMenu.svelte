@@ -85,14 +85,15 @@
             'displayText': "Rename",
             'class': 'fa-solid fa-shuffle'
         },
-        /*
+        
         {
-            'name': 'printMenu',
-            'onClick': dummyHandler,
-            'displayText': "Print",
-            'class': 'fa-solid fa-print'
+            'name': 'download',
+            'onClick': (e)=>dummyHandler(e,"download"),
+            'displayText': "Download",
+            'class': 'fa-solid fa-download'
         },
         
+        /*
         {
             'name': 'settings',
             'onClick': dummyHandler,
@@ -129,7 +130,7 @@
         <ul class="menu-list">
             {#each menuItems as item}
 
-                    <li><a on:click={item.onClick}><i class={item.class}></i>&nbsp;{item.displayText}</a></li>
+                    <li><a href="/" on:click|preventDefault={item.onClick}><i class={item.class}></i>&nbsp;{item.displayText}</a></li>
             {/each}
         </ul>
 </div>

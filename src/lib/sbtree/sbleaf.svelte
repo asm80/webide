@@ -82,9 +82,7 @@
     .hovermenu {
         visibility: hidden;
     }
-    .hover .hovermenu {
-        visibility: visible;
-    }
+
 </style>
 
     <div class="{level==0?"sb-tree-wrapper":""}">

@@ -1,5 +1,9 @@
 import { dialogs } from "svelte-dialogs";
 import {fixForSave, extractDir, extractFilename, replaceFilename, replaceExtension} from "$util/files.js"
+import { projectStore } from "$lib/shared/stores/project.js"
+import { get } from "svelte/store"
+
+import JSZip from "jszip"
 
 
 export const ctxAction = async (event, tabsOpened, data, rebuildTree) => {
@@ -55,6 +59,38 @@ export const ctxAction = async (event, tabsOpened, data, rebuildTree) => {
             console.log("rename item", path, newPath)
             await data.fs.rename(fixForSave(path), fixForSave(newPath))
             rebuildTree(true)
+            break;
+        case "download":
+            let project = get(projectStore)
+            console.log("Download", path, itemType, project)
+            if (itemType == "folder") {
+                //we'll zip it
+                
+                let filelist = await data.fs.readdir(fixForSave(path), true, true)
+                console.log("To Zip", filelist)
+                let zip = new JSZip()
+                for (let fn of filelist) {
+                    if (fn.indexOf("..empty")>=0) continue
+                    let file = await data.fs.readFile(fixForSave(path+"/"+fn))
+                    zip.file(fn, file)
+                }
+                let content = await zip.generateAsync({type:"blob"})
+                let url = URL.createObjectURL(content)
+                let a = document.createElement("a")
+                a.href = url
+                a.download = project.name+".zip"
+                a.click()
+                break;
+            } else {
+                let file = await data.fs.readFile(fixForSave(path))
+                let blob = new Blob([file], {type: "application/octet-stream"})
+                let url = URL.createObjectURL(blob)
+                let a = document.createElement("a")
+                a.href = url
+                a.download = extractFilename(path)
+                a.click()
+            }
+            
             break;
     }
 }
