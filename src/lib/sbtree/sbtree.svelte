@@ -174,7 +174,7 @@
 
 
 {#each data as item, index}
-    <div class="item {item.nodes?"folder":"file"} {level==0?"sb-tree-level0":""}" role="button" tabindex="0" 
+    <div class="item mb-0 {item.nodes?"folder":"file"} {level==0?"sb-tree-level0":""}" role="button" tabindex="0" 
         on:click={updown(item)} 
         on:dblclick={updown(item, true)}
         on:keydown={updown(item)}

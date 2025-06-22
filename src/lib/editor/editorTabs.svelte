@@ -1,5 +1,6 @@
 <script>
-export let tabsOpened;
+//export let tabsOpened = $state([]);
+let {tabsOpened} = $props();
 
 import { createEventDispatcher } from "svelte";
 
@@ -20,6 +21,7 @@ const dispatch = createEventDispatcher();
 
 const selectTab = (tab) => {
     dispatch("selectTab", tab);
+    return false;
 }
 const closeTab = (tab) => {
     dispatch("closeTab", tab);
@@ -77,7 +79,7 @@ const closeTab = (tab) => {
         {#each tabsOpened as tab}
             <li class="{tab.active?'is-active':''} {tab.dangling?"dangling":""} {tab.dirty?"dirty":""}">
                 <a 
-                on:click={() => selectTab(tab)}
+                on:click={(e) => {e.preventDefault(); selectTab(tab)}}
                 on:keydown={(e) => {if (e.key == "Enter") selectTab(tab)}}
                 role="button"
                 tabindex="{tab.active?0:-1}"

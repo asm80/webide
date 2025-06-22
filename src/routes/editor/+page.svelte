@@ -3,7 +3,7 @@
 	export let data;
 	import {buildTree} from '$lib/shared/buildTree.js'
 	import { localfs } from '$lib/shared/stores/localfs.js'
-	import { dialogs } from "svelte-dialogs";
+	import { Alert, Prompt } from "$lib/dialogs";
 
 	import {fixForSave, extractDir, extractFilename, replaceFilename, replaceExtension} from "$util/files.js"
 
@@ -185,10 +185,10 @@
 					await data.fs.writeFile(path+replaceExtension(fn,"hex"), hex)
 					await data.fs.writeFile(path+replaceExtension(fn,"lst"), lst)
 				}
-				dialogs.alert("Compilation successful")
+				Alert("Compilation successful")
 			}
 		} catch (e) {
-			dialogs.alert(`Compilation error:<br>${e.msg}<br>Line Number: ${e.s.numline}<br>Line: <i>${e.s.line}</i>`)
+			Alert(`Compilation error:<br>${e.msg}<br>Line Number: ${e.s.numline}<br>Line: <i>${e.s.line}</i>`)
 			//console.error("Compilation error", error)
 			return
 		}

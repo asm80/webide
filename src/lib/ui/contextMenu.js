@@ -1,4 +1,4 @@
-import { dialogs } from "svelte-dialogs";
+import { Alert, Prompt } from "$lib/dialogs";
 import {fixForSave, extractDir, extractFilename, replaceFilename, replaceExtension} from "$util/files.js"
 import { projectStore } from "$lib/shared/stores/project.js"
 import { get } from "svelte/store"
@@ -39,7 +39,7 @@ export const ctxAction = async (event, tabsOpened, data, rebuildTree) => {
     switch (action) {
         case "deleteitem":
             
-            let result = await dialogs.confirm("Are you sure you want to delete '"+fixForSave(path)+"'?", "Delete file")
+            let result = await Alert("Are you sure you want to delete '"+fixForSave(path)+"'?", "Delete file")
             if (!result) return
             console.log("Delete item", path, result)
             if (itemType == "file") {
@@ -61,7 +61,7 @@ export const ctxAction = async (event, tabsOpened, data, rebuildTree) => {
             if (itemType == "file") {
                 dir = extractDir(path)
             }
-            name = await dialogs.prompt("File name", {title:"Create file in "+(dir), submitButtonText:"Create", resetButton:false})
+            name = await Prompt("File name", {title:"Create file in "+(dir), submitButtonText:"Create", resetButton:false})
             if (!name) return
             console.log("Add item", name)
             await data.fs.writeFile(fixForSave(dir+"/"+name), "")
@@ -72,14 +72,14 @@ export const ctxAction = async (event, tabsOpened, data, rebuildTree) => {
             if (itemType == "file") {
                 dir = extractDir(path)
             }
-            name = await dialogs.prompt("File name", {title:"Create folder in "+(dir), submitButtonText:"Create", resetButton:false})
+            name = await Prompt("File name", {title:"Create folder in "+(dir), submitButtonText:"Create", resetButton:false})
             if (!name) return
             await data.fs.writeFile(fixForSave(dir+"/"+name+"/..empty"), "")
             rebuildTree()
             break;
         case "rename":
 
-            name = await dialogs.prompt("New name", {title:"Rename "+extractFilename(path), submitButtonText:"Rename", resetButton:false})
+            name = await Prompt("New name", {title:"Rename "+extractFilename(path), submitButtonText:"Rename", resetButton:false})
             if (!name) return
             let newPath = replaceFilename(path, name)
             console.log("rename item", path, newPath)

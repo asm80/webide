@@ -19,13 +19,13 @@
           </a>
   
           <div class="navbar-dropdown">
-            <a class="navbar-item" href="/">
+            <a class="navbar-item" href="/editor">
               New File
             </a>
-            <a class="navbar-item" href="/">
+            <a class="navbar-item" href="/editor">
               Save
             </a>
-            <a class="navbar-item" href="/">
+            <a class="navbar-item" href="/editor">
               Save As...
             </a>
             <hr class="navbar-divider">
@@ -64,22 +64,22 @@
         </div>
         
         <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link" href="/">
+          <a class="navbar-link" href="/editor">
             Compile
           </a>
   
           <div class="navbar-dropdown">
-            <a class="navbar-item" href="/">
+            <a class="navbar-item" href="/editor">
               Compile to HEX
             </a>
-            <a class="navbar-item" href="/">
+            <a class="navbar-item" href="/editor">
               Compile to BIN
             </a>
-            <a class="navbar-item" href="/">
+            <a class="navbar-item" href="/editor">
               Compile to OBJ
             </a>
             <hr class="navbar-divider">
-            <a class="navbar-item" href="/">
+            <a class="navbar-item" href="/editor">
               Report an issue
             </a>
           </div>

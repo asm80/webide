@@ -29,15 +29,18 @@ $tabs-link-hover-color: yellow;
 
 $menu-list-link-padding: 0.2rem;
 
+$light: #FFF;
+$white: #FFF;
+
  
-@import "./assets/bulma/bulma.sass";
+@use "assets/bulma/bulma.scss";
 
 @import "./assets/own.css";
 
 
 
 body {
-    background-color: $light;
+    background-color: #FFF;
     height: 100vh;
     transition: all 0.4s ease;
 }
@@ -51,12 +54,12 @@ body .title {
 
 body.dark {
     background-color: $dark;
-    color: $light;
+    color: #FFF;
 }
 
 body.dark .subtitle,
 body.dark .title {
-    color: $light;
+    color: #FFF;
 }
 
 .section {
@@ -70,14 +73,14 @@ body.dark .title {
 button{
     cursor: pointer;
     border: none;
-    color: $light;
+    color: #FFF;
     padding: .8rem;
     background: $dark;
     border-radius: 6px;
 }
 
 body.dark button {
-    background: $light;
+    background: #FFF;
     color: $dark;
 }
 
@@ -90,7 +93,7 @@ body>div.container {
     background: $dark;
     li {
       a {
-        color: $white;
+        color: #FFF;
       }
     }
   }

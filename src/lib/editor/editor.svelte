@@ -1,15 +1,16 @@
 <script>
-    export let ideSize;
+    //export let ideSize;
     import Monaco from '$lib/monaco/monaco.svelte';
-    import { dialogs } from "svelte-dialogs";
+    import { Alert, Prompt } from "$lib/dialogs";
     import EditorTabs from './editorTabs.svelte';
     import { onDestroy, onMount } from 'svelte';
     import { replaceFilename, fixForSave } from "$util/files.js"
     import { createEventDispatcher } from "svelte";
     let editorText = "Dummy"
-    export let tabsOpened;
+    //export let tabsOpened;
+    let {tabsOpened, fs, ideSize} = $props();
 
-    export let fs;
+    //export let fs;
 
 
     let activeTab
@@ -160,7 +161,7 @@ const fileEdited = (event) => {
 
 const saveFileAs = async (event) => {
     let data = event.detail
-    let newName = await dialogs.prompt("File name", {title:"Save file as", submitButtonText:"Save", resetButton:false})
+    let newName = await Prompt("File name", {title:"Save file as", submitButtonText:"Save", resetButton:false})
     if (!newName) return
     let path = activeTab.path
     let newPath = replaceFilename(path, newName)
