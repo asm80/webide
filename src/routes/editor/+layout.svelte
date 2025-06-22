@@ -7,7 +7,8 @@
 	export let data;
 	import {buildTree} from '$lib/shared/buildTree.js'
 	import { localfs } from '$lib/shared/stores/localfs.js'
-	import { Alert, Prompt } from "$lib/dialogs";
+//	import { Alert, Prompt } from "$lib/dialogs";
+	import {dialogs} from "svelte-dialogs";
 
 	import { treeData as defaultTreeData } from '../../test-tree';
 	import {fixForSave, extractDir, extractFilename, replaceFilename, replaceExtension} from "$util/files.js"
@@ -37,11 +38,12 @@
 	import compilerWorker from "$util/workerPromise.js"
 
 	import { projectStore } from "$lib/shared/stores/project.js"
+	import { tabsStore } from "$util/stores/tabsStore.js"
 
 	let treeData = defaultTreeData
 
 	export let ideSize="small"
-	let tabsOpened = []
+	$: tabsOpened = $tabsStore;
 
 	let appLayout = "main"; //main, projectSelector, ...
 
@@ -99,12 +101,12 @@
 		let toml = TOML.stringify(project, {newline: "\n"})
 		await data.fs.writeFile("_project.toml", toml)
 		// is _project.toml in opened tabs?
-		let found = tabsOpened.filter(t => t.path == `/${project.name}/_project.toml`)
-		console.log("Found", toml, found, tabsOpened)
+		let found = $tabsStore.filter(t => t.path == `/${project.name}/_project.toml`)
+		console.log("Found", toml, found, $tabsStore)
 		if (found.length > 0) {
 			found[0].data = toml
 			found[0].justOpened = true
-			tabsOpened = tabsOpened
+			tabsStore.update(tabs => [...tabs])
 		}
 	}
 
@@ -129,7 +131,7 @@
 
 	onMount(async () => {
 		//console.log("Mounted")
-		recountOrders(tabsOpened)
+		recountOrders($tabsStore)
 		/*
 		const container = document.getElementById("fileTabs");
 		// where "container" is the id of the container
@@ -153,11 +155,11 @@
 
 
 	const ibuttonTest = async () => {
-		console.log("Button test")
+		console.log("Button test", $tabsStore)
 		//ui.buttonTest(tabsOpened)
-		tabsOpened.filter(t => t.active)[0].data += "Button test"
-		tabsOpened.filter(t => t.active)[0].justOpened = true;
-		tabsOpened = tabsOpened
+		//tabsOpened.filter(t => t.active)[0].data += "Button test"
+		//tabsOpened.filter(t => t.active)[0].justOpened = true;
+		//tabsOpened = tabsOpened
 		return
 
 
@@ -170,7 +172,7 @@
 
 	const doCompile = async () => {
 		console.log("Compiler is going...")
-		let activeTab = tabsOpened.filter(t => t.active)[0]
+		let activeTab = $tabsStore.filter(t => t.active)[0]
 		console.log("Active tab", activeTab)
 		if (!activeTab) return
 		console.log("DOCO",activeTab.path)
@@ -194,11 +196,12 @@
 					await data.fs.writeFile(path+replaceExtension(fn,"hex"), hex)
 					await data.fs.writeFile(path+replaceExtension(fn,"lst"), lst)
 				}
-				Alert("Compilation successful")
+				dialogs.alert("Compilation successful")
 			}
 		} catch (e) {
-			Alert(`Compilation error:<br>${e.msg}<br>Line Number: ${e.s.numline}<br>Line: <i>${e.s.line}</i>`)
-			//console.error("Compilation error", error)
+			console.error("Compilation error", e)
+			dialogs.alert(`Compilation error:<br>${e.msg}<br>Line Number: ${e.s.numline}<br>Line: <i>${e.s.line}</i>`)
+			
 			return
 		}
 	}
@@ -206,7 +209,7 @@
 	// proxy functions for event handling. It passes essential data to UI module
 
 	const closeTab = (event) => {
-		tabsOpened=ui.closeTab(event,tabsOpened)
+		tabsStore.set(ui.closeTab(event,$tabsStore))
 	}
 
 	const selectTab = (event) => {
@@ -214,13 +217,13 @@
 	}
 
 	const ctxAction = (event) => {
-		ui.ctxAction(event, tabsOpened, data, rebuildTree)
+		ui.ctxAction(event, $tabsStore, data, rebuildTree)
 	}
 
 	const openFile = async (e) => {
-		let res = await ui.openFile(e, tabsOpened, cursor, data)
+		let res = await ui.openFile(e, $tabsStore, cursor, data)
 		console.log("Open file", res)
-		tabsOpened = res.tabsOpened
+		tabsStore.set(res.tabsOpened)
 		cursor = res.cursor
 	}
 
@@ -232,6 +235,7 @@
 			appLayout = event.detail.layout
 		}
 	}
+
 
 
 

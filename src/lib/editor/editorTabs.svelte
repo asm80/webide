@@ -1,6 +1,6 @@
 <script>
-//export let tabsOpened = $state([]);
-let {tabsOpened} = $props();
+export let tabsOpened;
+//let {tabsOpened} = $props();
 
 import { createEventDispatcher } from "svelte";
 
@@ -86,7 +86,7 @@ const closeTab = (tab) => {
                 title={tab.path}
                 href="/"
                     >{lastElementOfFileName(tab.path)}&nbsp;<i 
-                    on:click={()=>closeTab(tab)} 
+                    on:click={(e)=>{e.preventDefault(); closeTab(tab)}} 
                     on:keydown={(e) => {if (e.key == "Enter") closeTab(tab)}}
                     role="button"
                     tabindex="{tab.active?0:-1}"

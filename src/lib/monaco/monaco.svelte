@@ -129,4 +129,4 @@ $: setFontSize(ideSize)
 
 </script>
 
-<div class="hero ais-fullheight" bind:this={editorElement} />
+<div class="hero ais-fullheight" bind:this={editorElement}></div>

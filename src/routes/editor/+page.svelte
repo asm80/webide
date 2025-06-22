@@ -1,6 +1,7 @@
 <script>
 
 	export let data;
+	
 	import {buildTree} from '$lib/shared/buildTree.js'
 	import { localfs } from '$lib/shared/stores/localfs.js'
 	import { Alert, Prompt } from "$lib/dialogs";
@@ -32,11 +33,12 @@
 	import compilerWorker from "$util/workerPromise.js"
 
 	import { projectStore } from "$lib/shared/stores/project.js"
+	import { tabsStore } from "$util/stores/tabsStore.js"
 
 	let treeData = []
 
 	let ideSize="small"
-	let tabsOpened = []
+	$: tabsOpened = $tabsStore
 
 	let appLayout = "main"; //main, projectSelector, ...
 
@@ -94,12 +96,12 @@
 		let toml = TOML.stringify(project, {newline: "\n"})
 		await data.fs.writeFile("_project.toml", toml)
 		// is _project.toml in opened tabs?
-		let found = tabsOpened.filter(t => t.path == `/${project.name}/_project.toml`)
-		console.log("Found", toml, found, tabsOpened)
+		let found = $tabsStore.filter(t => t.path == `/${project.name}/_project.toml`)
+		console.log("Found", toml, found, $tabsStore)
 		if (found.length > 0) {
 			found[0].data = toml
 			found[0].justOpened = true
-			tabsOpened = tabsOpened
+			tabsStore.update(tabs => [...tabs])
 		}
 	}
 
@@ -123,8 +125,8 @@
 
 
 	onMount(async () => {
-		//console.log("Mounted")
-		recountOrders(tabsOpened)
+		console.log("Mounted", $tabsStore)
+		recountOrders($tabsStore)
 		const container = document.getElementById("fileTabs");
 		// where "container" is the id of the container
   		container.addEventListener("wheel", function (e) {
@@ -145,59 +147,14 @@
 	})
 
 
-	const ibuttonTest = async () => {
-		console.log("Button test")
-		//ui.buttonTest(tabsOpened)
-		tabsOpened.filter(t => t.active)[0].data += "Button test"
-		tabsOpened.filter(t => t.active)[0].justOpened = true;
-		tabsOpened = tabsOpened
-		return
 
 
-		let fs = get(localfs)
-		compilerWorker.postMessage( {msg:"compile",file:"test.a80", fs:fs})
-		console.log("Posted")
-		//let asm = await compile("test.a80", fs)
-		//console.log(s)
-	}
 
-	const doCompile = async () => {
-		let activeTab = tabsOpened.filter(t => t.active)[0]
-		if (!activeTab) return
-		console.log("DOCO",activeTab.path)
-		try {
-			let msg = await compilerWorker.postMessage( {msg:"compile",file:fixForSave(activeTab.path), fs:get(localfs)})
-			if (msg.msg == "compiled") {
-				let file = msg.file
-				let hex = msg.data.hex
-				let lst = msg.data.lst
-				let path = extractDir(file)
-				let fn = extractFilename(file)
-				let dstPath = path
-				console.log("Compiled", path,fn)
-				if (path.includes("src")) {
-					dstPath = path.replace("src", "hex/")
-					//console.log("DST", dstPath)
-					await data.fs.writeFile(dstPath+replaceExtension(fn,"hex"), hex)
-					dstPath = path.replace("src", "lst/")
-					await data.fs.writeFile(dstPath+replaceExtension(fn,"lst"), lst)
-				} else {
-					await data.fs.writeFile(path+replaceExtension(fn,"hex"), hex)
-					await data.fs.writeFile(path+replaceExtension(fn,"lst"), lst)
-				}
-				Alert("Compilation successful")
-			}
-		} catch (e) {
-			Alert(`Compilation error:<br>${e.msg}<br>Line Number: ${e.s.numline}<br>Line: <i>${e.s.line}</i>`)
-			//console.error("Compilation error", error)
-			return
-		}
-	}
 
 	// proxy functions for event handling. It passes essential data to UI module
 
 	const closeTab = (event) => {
-		tabsOpened=ui.closeTab(event,tabsOpened)
+		tabsStore.set(ui.closeTab(event,$tabsStore))
 	}
 
 	const selectTab = (event) => {
@@ -205,13 +162,13 @@
 	}
 
 	const ctxAction = (event) => {
-		ui.ctxAction(event, tabsOpened, data, rebuildTree)
+		ui.ctxAction(event, $tabsStore, data, rebuildTree)
 	}
 
 	const openFile = async (e) => {
-		let res = await ui.openFile(e, tabsOpened, cursor, data)
+		let res = await ui.openFile(e, $tabsStore, cursor, data)
 		console.log("Open file", res)
-		tabsOpened = res.tabsOpened
+		tabsStore.set(res.tabsOpened)
 		cursor = res.cursor
 	}
 
@@ -252,7 +209,7 @@
 				/>
 		</aside>
 	</div>
-	<div class="column is-8 ais-fullheight is-main-content p-0">
+	<div class="column is-8 ais-fullheight is-main-content p-0"  style="overflow-x:hidden;overflow-y:hidden;">
 		<Editor {ideSize} {tabsOpened} on:closeTab={closeTab} on:selectTab={selectTab} fs={data.fs}/>
 	</div>
 

@@ -1,5 +1,5 @@
 <script>
-    //export let ideSize;
+    export let ideSize;
     import Monaco from '$lib/monaco/monaco.svelte';
     import { Alert, Prompt } from "$lib/dialogs";
     import EditorTabs from './editorTabs.svelte';
@@ -7,10 +7,10 @@
     import { replaceFilename, fixForSave } from "$util/files.js"
     import { createEventDispatcher } from "svelte";
     let editorText = "Dummy"
-    //export let tabsOpened;
-    let {tabsOpened, fs, ideSize} = $props();
+    export let tabsOpened;
+    //let {tabsOpened, fs, ideSize} = $props();
 
-    //export let fs;
+    export let fs;
 
 
     let activeTab
@@ -189,6 +189,7 @@ $: changedTab(tabsOpened)
     on:closeTab={(e)=>dispatch("closeTab", e.detail)}
 />
 
+{#if tabsOpened.length > 0}
 <Monaco 
     {ideSize} 
     {editorText} 
@@ -196,3 +197,13 @@ $: changedTab(tabsOpened)
     on:saveFileAs={saveFileAs}
     on:fileEdited={fileEdited} 
 />
+{/if}
+{#if tabsOpened.length == 0}
+<div class="hero is-fullheight">
+    <div class="hero-body">
+        <div class="container">
+            <h1 class="title">Open a file or create a new one</h1>
+        </div>
+    </div>
+</div>
+{/if}
